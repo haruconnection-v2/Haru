@@ -1,20 +1,15 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
+about: 기능 설명 및 구현
+title: "[feat]"
+labels: "\U0001FA84feature"
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+## 💡 구현할 기능 설명
+- 
+## ❗체크리스트
+- [x] 모든 포지션의 팀원들이 이해할 수 있도록 충분한 설명을 제공하나요?
+- [x] 제목 형식을 지키고 브랜치 및 라벨을 할당했나요?
+- [x] 메인 브랜치에서 작업하지는 않았나요?
