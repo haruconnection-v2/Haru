@@ -15,11 +15,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.backend.domain.calendar.entity.Calendar;
 import com.backend.domain.calendar.repository.CalendarRepository;
 import com.backend.domain.calendar.service.CalendarService;
+import com.backend.domain.diary.dto.DiaryCreateRequest;
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
 import com.backend.domain.diary.dto.DiarySnsDto;
 import com.backend.domain.diary.entity.Diary;
 import com.backend.domain.diary.repository.DiaryRepository;
+import com.backend.global.common.exception.BadRequestException;
+import com.backend.global.common.exception.ConflictException;
+import com.backend.global.common.exception.NotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -46,6 +50,7 @@ class DiaryServiceImplTest {
 	private DiarySnsDto diarySnsDto;
 	private DiaryRequest diaryRequest;
 	private Calendar calendar;
+	private DiaryCreateRequest createDiaryRequest;
 	@BeforeEach
 	void setUp() {
 		foundDiary = Diary.builder()
@@ -62,15 +67,26 @@ class DiaryServiceImplTest {
 			.diaryBgId(1L)
 			.isExpiry(true)
 			.build();
-		expiredDiarySnsDto = new DiarySnsDto(1L, "2024-09", "2024-09-15", "ws/abcdefg", true);
-		diarySnsDto = new DiarySnsDto(1L, "2024-09", "2024-09-15", "ws/abcdefg", false);
+		expiredDiarySnsDto = DiarySnsDto.builder()
+			.diaryId(1L)
+			.monthYear("2024-09")
+			.day("2024-09-15")
+			.snsLink("ws/abcdefg")
+			.isExpiry(true).build();
+		diarySnsDto = DiarySnsDto.builder()
+			.diaryId(1L)
+			.monthYear("2024-09")
+			.day("2024-09-15")
+			.snsLink("ws/abcdefg")
+			.isExpiry(false).build();
 		diaryRequest = new DiaryRequest(1L, "2024-09", 1L, "2024-09-15");
+		createDiaryRequest = DiaryCreateRequest.builder().diaryBgId(1L).monthYear("2024-09").day("2024-09-15").build();
 		calendar = Calendar.builder().monthYear("2024-09").build();
 	}
 	@Test
 	void 일기_조회에_실패하여_예외가_발생한다() {
 		given(diaryRepository.findById(any())).willReturn(Optional.empty());
-		assertThrows(IllegalArgumentException.class, () -> diaryService.getDiaryDetialData(1L));
+		assertThrows(NotFoundException.class, () -> diaryService.getDiaryDetialData(1L));
 		verify(diaryRepository).findById(any());
 	}
 	@Test
@@ -89,7 +105,7 @@ class DiaryServiceImplTest {
 		given(request.getSession()).willReturn(session);
 		given(session.getAttribute("calendarId")).willReturn(null);
 
-		assertThrows(IllegalArgumentException.class, () -> diaryService.getDiarySnsLink(day, request));
+		assertThrows(NotFoundException.class, () -> diaryService.getDiarySnsLink(day, request));
 		verify(diaryRepository, never()).findDiarySnsByCalendarIdAndDay(any(), any());
 	}
 	@Test
@@ -101,7 +117,7 @@ class DiaryServiceImplTest {
 		given(diaryRepository.findDiarySnsByCalendarIdAndDay(any(), any()))
 			.willReturn(expiredDiarySnsDto);
 
-		assertThrows(IllegalArgumentException.class, () -> diaryService.getDiarySnsLink(day, request));
+		assertThrows(BadRequestException.class, () -> diaryService.getDiarySnsLink(day, request));
 
 	}
 	@Test
@@ -128,7 +144,7 @@ class DiaryServiceImplTest {
 		given(session.getAttribute("calendarId")).willReturn(calendarId1);
 		given(diaryRepository.existsByCalendarIdAndDay(any(), any())).willReturn(true);
 		given(calendarRepository.findById(any())).willReturn(Optional.of(calendar));
-		assertThrows(IllegalArgumentException.class, () -> diaryService.createDiary(diaryRequest, request));
+		assertThrows(ConflictException.class, () -> diaryService.createDiary(createDiaryRequest, request));
 	}
 
 	@Test
@@ -142,10 +158,10 @@ class DiaryServiceImplTest {
 		given(diaryRepository.existsByCalendarIdAndDay(any(), any())).willReturn(false);
 		given(diaryRepository.save(any(Diary.class))).willReturn(foundDiary);
 
-		DiaryResponse diaryResponse = diaryService.createDiary(diaryRequest, request);
+		DiaryResponse diaryResponse = diaryService.createDiary(createDiaryRequest, request);
 
 		assertNotNull(diaryResponse);
-		assertEquals(diaryResponse.getDay(), day);
+		assertEquals(diaryResponse.getDiaryId(), foundDiary.getId());
 	}
 	@Test
 	void saveFinallyDiary() {

@@ -2,6 +2,7 @@ package com.backend.domain.diary.service;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.diary.dto.DiaryCreateRequest;
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
 
@@ -13,7 +14,7 @@ public interface DiaryService {
 
 	DiaryResponse getDiarySnsLink(String day, HttpServletRequest request);
 
-    DiaryResponse createDiary(DiaryRequest diaryRequest, HttpServletRequest request);
+    DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request);
 
 	void saveFinallyDiary(DiaryRequest diaryRequest, HttpServletRequest request);
 
