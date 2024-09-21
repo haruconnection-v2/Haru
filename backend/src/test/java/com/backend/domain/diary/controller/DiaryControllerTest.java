@@ -53,7 +53,7 @@ class DiaryControllerTest {
 		nullCalendarIdsession.setAttribute("calendarId", null);
 		haveCalendarIdSession = new MockHttpSession();
 		haveCalendarIdSession.setAttribute("calendarId", 1L);
-		invalidDiaryRequest = new DiaryRequest();
+		invalidDiaryRequest = DiaryRequest.builder().build();
 	}
 	@Test
 	void getDiaryDetail() throws Exception {
@@ -97,9 +97,10 @@ class DiaryControllerTest {
 			.content(new ObjectMapper().writeValueAsString(invalidDiaryRequest)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").exists());*/
-		DiaryRequest diaryRequest = new DiaryRequest();
-		diaryRequest.setDiaryBgId(1L);
-		diaryRequest.setDay("2024-09-18");
+		DiaryRequest diaryRequest = DiaryRequest.builder()
+			.diaryBgId(1L)
+			.day("2024-09-18")
+			.build();
 		DiaryResponse CreatedDiaryResponse = DiaryResponse.builder().diaryId(1L).snsLink("ws/").build();
 		given(diaryService.createDiary(any(DiaryCreateRequest.class), any(HttpServletRequest.class)))
 			.willReturn(CreatedDiaryResponse);

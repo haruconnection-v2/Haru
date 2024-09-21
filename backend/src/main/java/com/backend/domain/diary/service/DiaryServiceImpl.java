@@ -111,7 +111,7 @@ class DiaryServiceImpl implements DiaryService {
 		//Textbox, Imagebox 저장 구현 필요
 		Diary diary = diaryRepository.findById(diaryRequest.getDiaryId())
 			.orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
-		diary.setIsExpiry(true);
+		diary.expireDiary();
 		diaryRepository.save(diary);
 	}
 }
