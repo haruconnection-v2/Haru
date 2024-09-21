@@ -1,6 +1,5 @@
 package com.backend.global.common.exception;
 
-import org.junit.jupiter.api.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,8 +19,19 @@ public class GlobalExceptionHandler {
 		return createErrorResponse(e.getErrorCode());
 	}
 
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<ErrorResponse> handleIllegalStateException(HttpServletRequest req, IllegalStateException e) {
+		log.error("Request:" + req.getRequestURI() + " IllegalStateException: " + e.getMessage());
+		return createErrorResponse(ErrorCode.INVALID_INPUT_VALUE, e.getMessage());
+	}
+
 	private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode) {
 		return new ResponseEntity<>(
 			ErrorResponse.of(errorCode), errorCode.getStatus());
 	}
+	private ResponseEntity<ErrorResponse> createErrorResponse(ErrorCode errorCode, String message) {
+		return new ResponseEntity<>(
+			ErrorResponse.of(errorCode, message), errorCode.getStatus());
+	}
+
 }
