@@ -15,13 +15,6 @@ public class DiarySnsDto {
 	private boolean isExpiry;
 
 	// 생성자
-	public DiarySnsDto(Long diaryId, String monthYear, String day, String snsLink, boolean isExpiry) {
-		this.diaryId = diaryId;
-		this.monthYear = monthYear;
-		this.day = day;
-		this.snsLink = snsLink;
-		this.isExpiry = isExpiry;
-	}
 
 	@Override
 	public boolean equals(Object o) {

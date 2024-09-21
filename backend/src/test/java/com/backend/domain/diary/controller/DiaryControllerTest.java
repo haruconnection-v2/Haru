@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.backend.domain.diary.dto.DiaryCreateRequest;
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
 import com.backend.domain.diary.service.DiaryService;
@@ -100,7 +101,7 @@ class DiaryControllerTest {
 		diaryRequest.setDiaryBgId(1L);
 		diaryRequest.setDay("2024-09-18");
 		DiaryResponse CreatedDiaryResponse = DiaryResponse.builder().diaryId(1L).snsLink("ws/").build();
-		given(diaryService.createDiary(any(DiaryRequest.class), any(HttpServletRequest.class)))
+		given(diaryService.createDiary(any(DiaryCreateRequest.class), any(HttpServletRequest.class)))
 			.willReturn(CreatedDiaryResponse);
 
 		mockMvc.perform(post("/v1/diaries")

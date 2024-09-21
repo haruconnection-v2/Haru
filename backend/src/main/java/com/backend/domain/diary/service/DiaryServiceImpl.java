@@ -6,12 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.calendar.entity.Calendar;
 import com.backend.domain.calendar.repository.CalendarRepository;
 import com.backend.domain.calendar.service.CalendarService;
+import com.backend.domain.diary.dto.DiaryCreateRequest;
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
 import com.backend.domain.diary.dto.DiarySnsDto;
 import com.backend.domain.diary.entity.Diary;
 import com.backend.domain.diary.repository.DiaryRepository;
+import com.backend.global.common.exception.BadRequestException;
+import com.backend.global.common.exception.ConflictException;
+import com.backend.global.common.exception.NotFoundException;
 import com.backend.global.common.mapper.DiaryMapper;
+import com.backend.global.common.response.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -30,7 +35,7 @@ class DiaryServiceImpl implements DiaryService {
 	//session 로직 추가 예정
 	@Override
 	public DiaryResponse getDiaryDetialData(Long diaryId) {
-		Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(() -> new IllegalArgumentException("해당 일기가 존재하지 않습니다."));
+		Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
 		DiaryResponse diaryResponse =  DiaryMapper.toDetailDiaryResponse(foundDiary);
 		//diaryResponse = setMemberNickname;
 		//diaryResponse = setTextAndImageBoxes;
@@ -41,11 +46,11 @@ class DiaryServiceImpl implements DiaryService {
 	public DiaryResponse getDiarySnsLink(String day, HttpServletRequest request) {
 		Long calendarId = (Long)request.getSession().getAttribute("calendarId");
 		if (calendarId == null) {
-			throw new IllegalArgumentException("캘린더가 존재하지 않습니다.");
+			throw new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND);
 		}
 		DiarySnsDto diarySnsDto = diaryRepository.findDiarySnsByCalendarIdAndDay(calendarId, day);
 		if (diarySnsDto.isExpiry()) {
-			throw new IllegalArgumentException("해당 일기는 만료되었습니다.");
+			throw new BadRequestException(ErrorCode.DIARY_GONE);
 		}
 		DiaryResponse diaryResponse = DiaryMapper.toSnsDiaryResponse(diarySnsDto);
 		//diaryResponse = setMemberNickname;
@@ -54,7 +59,7 @@ class DiaryServiceImpl implements DiaryService {
 
 	@Override
 	@Transactional
-	public DiaryResponse createDiary(DiaryRequest diaryRequest, HttpServletRequest request) {
+	public DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		//session calendarId
 		Calendar calendar = getOrCreateCalendar(diaryRequest, session);
@@ -63,12 +68,11 @@ class DiaryServiceImpl implements DiaryService {
 		Long roomId = 1L;
 		//make snsLink;
         String snsLink = generateSnsLink(request, roomId);
-		//diary create;
 		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar, snsLink));
 		return DiaryMapper.toCreateDiaryResponse(diary);
 	}
 
-	private Diary createDiaryEntity(DiaryRequest diaryRequest, HttpSession session, Calendar calendar, String snsLink) {
+	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar, String snsLink) {
 		return Diary.builder()
 			.calendar(calendar)
 			.diaryBgId(diaryRequest.getDiaryBgId())
@@ -79,25 +83,25 @@ class DiaryServiceImpl implements DiaryService {
 			.build();
 	}
 
+	private void validateDiaryNotExist(Long calendarId, String day) {
+		if (diaryRepository.existsByCalendarIdAndDay(calendarId, day)) {
+			throw new ConflictException(ErrorCode.DIARY_CONFLICT);
+		}
+	}
+
 	private String generateSnsLink(HttpServletRequest request, Long roomId) {
 		String host = request.getServerName();
 		int port = request.getServerPort();
 		return String.format("http://%s:%d/rooms/%d", host, port, roomId);
 	}
 
-	private Calendar getOrCreateCalendar(DiaryRequest diaryRequest, HttpSession session) {
+	private Calendar getOrCreateCalendar(DiaryCreateRequest diaryRequest, HttpSession session) {
 		Long calendarId = (Long)session.getAttribute("calendarId");
 		if (calendarId == null) {
 			return calendarService.createAndSessionStoreCalendar(session, diaryRequest.getMonthYear());
 		} else {
 			return calendarRepository.findById(calendarId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 캘린더가 존재하지 않습니다."));
-		}
-	}
-
-	private void validateDiaryNotExist(Long calendarId, String day) {
-		if (diaryRepository.existsByCalendarIdAndDay(calendarId, day)) {
-			throw new IllegalArgumentException("해당 날짜에 일기가 이미 존재합니다.");
+				.orElseThrow(() -> new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND));
 		}
 	}
 
@@ -106,9 +110,8 @@ class DiaryServiceImpl implements DiaryService {
 	public void saveFinallyDiary(DiaryRequest diaryRequest, HttpServletRequest request) {
 		//Textbox, Imagebox 저장 구현 필요
 		Diary diary = diaryRepository.findById(diaryRequest.getDiaryId())
-			.orElseThrow(() -> new IllegalArgumentException("해당 일기가 존재하지 않습니다."));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
 		diary.setIsExpiry(true);
 		diaryRepository.save(diary);
-		// diaryRepository.findById();
 	}
 }
