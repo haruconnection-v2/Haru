@@ -1,19 +1,17 @@
 package com.backend.domain.diary.dto;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class DiaryRequest {
-	private final Long diaryId;
-	private final String monthYear;
-	private final Long diaryBgId;
-	private final String day;
+	private final List<DiaryStickerReqDto> stickers;
+	private final List<DiaryTextBoxReqDto> textBoxes;
 	@Builder
-	public DiaryRequest(Long diaryId, String monthYear, Long diaryBgId, String day) {
-		this.diaryId = diaryId;
-		this.monthYear = monthYear;
-		this.diaryBgId = diaryBgId;
-		this.day = day;
+	public DiaryRequest(List<DiaryStickerReqDto> stickers, List<DiaryTextBoxReqDto> textBoxes) {
+		this.stickers = stickers;
+		this.textBoxes = textBoxes;
 	}
 }

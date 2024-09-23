@@ -1,5 +1,7 @@
 package com.backend.domain.diary.service;
 
+import static com.backend.domain.diary.mapper.DiaryMapper.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +17,6 @@ import com.backend.domain.diary.repository.DiaryRepository;
 import com.backend.global.common.exception.BadRequestException;
 import com.backend.global.common.exception.ConflictException;
 import com.backend.global.common.exception.NotFoundException;
-import com.backend.global.common.mapper.DiaryMapper;
 import com.backend.global.common.response.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,12 +35,10 @@ class DiaryServiceImpl implements DiaryService {
 	//mapper에 member.nickname 추가예정
 	//session 로직 추가 예정
 	@Override
-	public DiaryResponse getDiaryDetialData(Long diaryId) {
+	public DiaryResponse getDiaryDetialData(Long diaryId, HttpServletRequest request) {
 		Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
-		DiaryResponse diaryResponse =  DiaryMapper.toDetailDiaryResponse(foundDiary);
-		//diaryResponse = setMemberNickname;
-		//diaryResponse = setTextAndImageBoxes;
-		return diaryResponse;
+		String nickname = request.getSession().getAttribute("nickname").toString();
+		return toDetailDiaryResponse(foundDiary, nickname);
 	}
 
 	@Override
@@ -52,35 +51,31 @@ class DiaryServiceImpl implements DiaryService {
 		if (diarySnsDto.isExpiry()) {
 			throw new BadRequestException(ErrorCode.DIARY_GONE);
 		}
-		DiaryResponse diaryResponse = DiaryMapper.toSnsDiaryResponse(diarySnsDto);
+		String nickname = request.getSession().getAttribute("nickname").toString();
 		//diaryResponse = setMemberNickname;
-		return diaryResponse;
+		return toSnsDiaryResponse(diarySnsDto, nickname);
 	}
 
 	@Override
 	@Transactional
 	public DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		//session calendarId
 		Calendar calendar = getOrCreateCalendar(diaryRequest, session);
-		validateDiaryNotExist((Long)session.getAttribute("calendarId"), diaryRequest.getDay());
+		validateDiaryNotExist(calendar.getId(), diaryRequest.getDay());
 		//room create;
 		Long roomId = 1L;
 		//make snsLink;
         String snsLink = generateSnsLink(request, roomId);
 		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar, snsLink));
-		return DiaryMapper.toCreateDiaryResponse(diary);
+		String nickname = session.getAttribute("nickname").toString();
+		return toCreateDiaryResponse(diary, nickname);
 	}
 
-	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar, String snsLink) {
-		return Diary.builder()
-			.calendar(calendar)
-			.diaryBgId(diaryRequest.getDiaryBgId())
-			.day(diaryRequest.getDay())
-			.monthYear(session.getAttribute("monthYear").toString())
-			.snsLink(snsLink)
-			.isExpiry(false)
-			.build();
+	private Calendar getOrCreateCalendar(DiaryCreateRequest diaryCreateRequest, HttpSession session) {
+		Calendar calendar = calendarRepository.findByMemberIdAndMonthYear((Long)session.getAttribute("memberId"), diaryCreateRequest.getMonthYear())
+			.orElse(calendarService.createAndSessionStoreCalendar(session, diaryCreateRequest.getMonthYear()));
+		session.setAttribute("calendarId", calendar.getId());
+		return calendar;
 	}
 
 	private void validateDiaryNotExist(Long calendarId, String day) {
@@ -95,23 +90,23 @@ class DiaryServiceImpl implements DiaryService {
 		return String.format("http://%s:%d/rooms/%d", host, port, roomId);
 	}
 
-	private Calendar getOrCreateCalendar(DiaryCreateRequest diaryRequest, HttpSession session) {
-		Long calendarId = (Long)session.getAttribute("calendarId");
-		if (calendarId == null) {
-			return calendarService.createAndSessionStoreCalendar(session, diaryRequest.getMonthYear());
-		} else {
-			return calendarRepository.findById(calendarId)
-				.orElseThrow(() -> new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND));
-		}
+	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar, String snsLink) {
+		return Diary.builder()
+			.calendar(calendar)
+			.diaryBgId(diaryRequest.getDiaryBgId())
+			.day(diaryRequest.getDay())
+			.monthYear(diaryRequest.getMonthYear())
+			.snsLink(snsLink)
+			.isExpiry(false)
+			.build();
 	}
 
 	@Override
 	@Transactional
-	public void saveFinallyDiary(DiaryRequest diaryRequest, HttpServletRequest request) {
-		//Textbox, Imagebox 저장 구현 필요
-		Diary diary = diaryRepository.findById(diaryRequest.getDiaryId())
+	public void saveFinallyDiary(Long diaryId, DiaryRequest diaryRequest) {
+		Diary diary = diaryRepository.findById(diaryId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
 		diary.expireDiary();
-		diaryRepository.save(diary);
+		diaryRepository.save(updateDiaryTextAndImageBoxes(diary, diaryRequest));
 	}
 }
