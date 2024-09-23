@@ -8,9 +8,9 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # root 비밀번호 설정
       MYSQL_DATABASE: ${MYSQL_DATABASE}            # 기본 데이터베이스 생성
       MYSQL_USER: ${MYSQL_USER}                    # 일반 사용자 생성
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}            # 일반 사용자 비밀번호 설정
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     env_file:
-      - ./.env
+      - .env
     ports:
       - "3306:3306"
     networks:
