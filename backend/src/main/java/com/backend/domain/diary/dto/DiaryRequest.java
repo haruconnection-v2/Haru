@@ -1,19 +1,17 @@
 package com.backend.domain.diary.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import java.util.List;
+
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class DiaryRequest {
-	private Long diaryId;
-	private String monthYear;
-	private Long diaryBgId;
-	@NotNull
-	private String day;
+	private final List<DiaryStickerReqDto> stickers;
+	private final List<DiaryTextBoxReqDto> textBoxes;
+	@Builder
+	public DiaryRequest(List<DiaryStickerReqDto> stickers, List<DiaryTextBoxReqDto> textBoxes) {
+		this.stickers = stickers;
+		this.textBoxes = textBoxes;
+	}
 }

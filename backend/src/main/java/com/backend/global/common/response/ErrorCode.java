@@ -14,7 +14,11 @@ public enum ErrorCode {
 
 	// Auth
 	// Member
-
+	MEMBER_LOGIN_CONFLICT(HttpStatus.CONFLICT, "M009", "이미 로그인 되어 있습니다."),
+	MEMBER_LOGOUT_CONFLICT(HttpStatus.CONFLICT, "M109", "이미 로그아웃 되어 있습니다."),
+	MEMBER_LOGIN_ID_CONFLICT(HttpStatus.CONFLICT, "M209", "이미 존재하는 아이디입니다."),
+	MEMBER_NICKNAME_CONFLICT(HttpStatus.CONFLICT, "M309", "이미 존재하는 닉네임입니다."),
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "해당 회원을 찾을 수 없습니다."),
 	// Diary
 	DIARY_BAD_REQUEST(HttpStatus.BAD_REQUEST, "D000", "Bad Request"),
 	DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "D004", "해당 일기를 찾을 수 없습니다"),
@@ -22,11 +26,11 @@ public enum ErrorCode {
 	DIARY_GONE(HttpStatus.GONE, "D010", "해당 일기가 만료되었습니다"),
 
 	// Calendar
-	CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "해당 달력을 찾을 수 없습니다.")
+	CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "해당 달력을 찾을 수 없습니다."),
 
 	// TextBox
-
-	// Image
+	// Sticker
+	NOT_FOUND_STICKER(HttpStatus.NOT_FOUND, "S004", "해당 스티커를 찾을 수 없습니다."),
 	;
 	private final HttpStatus status;
 	private final String message;
