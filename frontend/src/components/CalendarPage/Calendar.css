@@ -1,0 +1,261 @@
+/*일기 리스트 컨테이너*/
+.listcontainer {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 1.5rem;
+  font-family: mong;
+}
+/*일기 리스트 이름*/
+.listname {
+  font-size: 3rem;
+  font-weight: 900;
+  font-family: bmjua;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.topyear {
+  font-size: 1.2rem;
+  color: #aaaaaa;
+  display: flex;
+  justify-content: center;
+}
+.calendar {
+  width: 95%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*월*/
+.header {
+  width: 100%;
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-left: 6px;
+  margin-bottom: 1rem;
+}
+
+.headercol.col-start {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.text {
+  font-size: 1.2rem;
+}
+.text.month {
+  margin-right: 10px;
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+/* 여기까지 안됨 */
+
+/* 버튼 */
+.leftBtn {
+  position: absolute;
+  width: 2rem;
+  height: auto;
+  margin-top: 2rem;
+  margin-right: 30rem;
+  color: rgba(gray, 0.3);
+}
+
+.rightBtn {
+  position: absolute;
+  width: 2rem;
+  height: auto;
+  margin-top: 2rem;
+  margin-left: 30rem;
+  color: rgba(gray, 0.3);
+}
+
+.leftBtn:hover {
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  transform: scale(1.15);
+  color: #686868;
+}
+
+.rightBtn:hover {
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  transform: scale(1.15);
+  color: #686868;
+}
+
+/*요일*/
+.days {
+  width: 99.5%;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-left: 5px;
+  color: #000;
+}
+
+/*  */
+.dayscol {
+  width: 15%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.25rem;
+  background: #ffffff;
+}
+.dayscol:nth-child(1) {
+  /* 일요일(Sunday) */
+  color: #ffa9c3;
+}
+
+.dayscol:nth-child(7) {
+  /* 토요일(Saturday) */
+  color: #7dd5e1;
+}
+
+/*날짜(바디부분)*/
+.calendarbody {
+  width: 100%;
+  height: 75%;
+  padding-left: 5px;
+  z-index: 0;
+}
+
+.bodyrow {
+  width: 100%;
+  height: 20%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+/* 캘린더  내부*/
+.bodycol {
+  width: 14.6%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: 0.125rem solid #fff;
+  border-top: none;
+  font-size: 1rem;
+  background: #d8d8f0;
+  color: #000;
+}
+
+.bodycol > span {
+  margin-right: 6.5rem;
+  margin-bottom: 3.5rem;
+}
+.not-valid {
+  color: #aaaaaa;
+}
+.bodycol > img {
+  opacity: 1;
+}
+.today {
+  cursor: pointer;
+  color: #8f6abe;
+  background: #f2edff;
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+.bodycol.cell.valid:hover {
+  cursor: pointer;
+  background: #e7eef9;
+}
+.bodycol.cell.selected {
+  background: #b9ade4;
+  color: #2e8c3e;
+  font-weight: 600;
+}
+
+.hover-close {
+  align-items: center;
+  background-color: #aab1bc;
+  cursor: pointer;
+  display: flex;
+  height: 25px;
+  justify-content: center;
+  position: absolute;
+  transition: 0.2;
+  width: 25px;
+  z-index: 1;
+}
+.hover-close.open.hide {
+  display: none;
+}
+
+.listemoji {
+  /* align-items: center; */
+  cursor: pointer;
+  display: flex;
+  /* justify-content: center; */
+  margin-left: 0px;
+  z-index: 1;
+  font-size: 2rem;
+}
+
+.listLink {
+  text-decoration-line: none;
+  font-size: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(0%, 25%);
+  color: #e83710;
+}
+.listLink:hover {
+  color: rgb(205, 111, 111);
+}
+
+.GoToSelectInnerPaperBtn {
+  width: 2.875rem;
+  height: 2.8125rem;
+  flex-shrink: 0;
+  position: absolute;
+  z-index: 100;
+  margin-top: 1rem;
+  border-radius: 0.625rem;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.GoToSelectInnerPaperBtn:hover {
+  width: 3.125rem;
+  height: 3.125rem;
+  box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.25); /* 호버 시 그림자도 조절합니다. */
+}
+
+.GoToShareURLBtn {
+  height: 3.125rem;
+  flex-shrink: 0;
+  position: absolute;
+  z-index: 100;
+  margin-top: 0.625rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.GoToShareURLBtn:hover {
+  height: 3.5rem;
+}
