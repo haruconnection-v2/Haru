@@ -17,6 +17,7 @@ import com.backend.domain.chat.handler.ImageResizeHandler;
 import com.backend.domain.chat.handler.ImageRotateHandler;
 import com.backend.domain.chat.handler.MessageHandler;
 import com.backend.domain.chat.handler.NicknameInputHandler;
+import com.backend.domain.chat.handler.RoomMessageHandler;
 import com.backend.domain.chat.handler.SaveDalleHandler;
 import com.backend.domain.chat.handler.SaveStickerHandler;
 import com.backend.domain.chat.handler.SaveTextHandler;
@@ -55,6 +56,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 	private final StopObjectHandler stopObjectHandler;
 
 	private final Map<String, MessageHandler> handlerMap = new HashMap<>();
+	private final Map<String, RoomMessageHandler> roomHandlerMap = new HashMap<>();
 
 	@Override
 	@PostConstruct
@@ -64,32 +66,49 @@ public class WebSocketServiceImpl implements WebSocketService {
 		handlerMap.put("text_drag", textDragHandler);
 		handlerMap.put("text_resize", textResizeHandler);
 		handlerMap.put("save_text", saveTextHandler);
-		handlerMap.put("create_textbox", createTextbox);
 		handlerMap.put("image_drag", imageDragHandler);
 		handlerMap.put("image_resize", imageResizeHandler);
 		handlerMap.put("image_rotate", imageRotateHandler);
 		handlerMap.put("save_sticker", saveStickerHandler);
-		handlerMap.put("create_sticker", createStickerHandler);
 		handlerMap.put("dalle_drag", dalleDragHandler);
 		handlerMap.put("dalle_resize", dalleResizeHandler);
 		handlerMap.put("dalle_rotate", dalleRotateHandler);
 		handlerMap.put("save_dalle", dalleRotateHandler);
 		handlerMap.put("save_dalle", saveDalleHandler);
-		handlerMap.put("create_dalle", createDalleHandler);
 		handlerMap.put("delete_object", deleteObjectHandler);
 		handlerMap.put("drag_stop", stopObjectHandler);
 		handlerMap.put("rotate_stop", stopObjectHandler);
 		handlerMap.put("resize_stop", stopObjectHandler);
+
+		roomHandlerMap.put("create_textbox", createTextbox);
+		roomHandlerMap.put("create_sticker", createStickerHandler);
+		roomHandlerMap.put("create_dalle", createDalleHandler);
 	}
 
 	@Override
 	public JsonNode registerHandler(String type, Map<String, JsonNode> payload) {
 		MessageHandler handler = handlerMap.get(type);
 
+		//TODO
 		if (handler == null) {
 			throw new IllegalArgumentException("No handler found for type: " + type);
 		}
 
 		return handler.handle(payload);
+	}
+
+	@Override
+	public JsonNode registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
+		RoomMessageHandler handler = roomHandlerMap.get(type);
+
+		//TODO
+		if (handler == null) {
+			throw new IllegalArgumentException("No handler found for type: " + type);
+		}
+		if (handler == null) {
+			throw new IllegalArgumentException("No handler found for roomId: " + roomId);
+		}
+
+		return handler.handle(roomId, payload);
 	}
 }

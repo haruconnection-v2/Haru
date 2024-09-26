@@ -1,22 +1,29 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
+import com.backend.domain.diary.entity.DiaryTextBox;
+import com.backend.domain.diary.repository.DiaryTextBoxRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SaveTextHandler implements MessageHandler {
+
+	private final DiaryTextBoxRepository diaryTextBoxRepository;
 
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
-		// 저장 로직
 
 		String textId = payload.get("id").asText();
 		String content = payload.get("content").asText();
@@ -41,6 +48,21 @@ public class SaveTextHandler implements MessageHandler {
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
+
+		Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.parseLong(textId));
+		// TODO Exception
+		DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+
+		UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
+			.content(content)
+			.xcoor(Integer.parseInt(x))
+			.ycoor(Integer.parseInt(y))
+			.width(Integer.parseInt(width))
+			.height(Integer.parseInt(height))
+			.build();
+
+		diaryTextBox.updateDiaryTextBox(req);
+		diaryTextBoxRepository.save(diaryTextBox);
 
 		return response;
 	}

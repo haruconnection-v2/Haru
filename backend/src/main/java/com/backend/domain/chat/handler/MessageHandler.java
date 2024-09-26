@@ -7,4 +7,5 @@ import com.fasterxml.jackson.databind.JsonNode;
 public interface MessageHandler {
 
 	JsonNode handle(Map<String, JsonNode> payload);
+
 }

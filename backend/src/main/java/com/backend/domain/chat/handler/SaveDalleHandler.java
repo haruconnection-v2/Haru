@@ -1,21 +1,29 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
+import com.backend.domain.diary.entity.DiarySticker;
+import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SaveDalleHandler implements MessageHandler {
+
+	private final DiaryStickerRepository diaryStickerRepository;
+
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
-		// 저장 로직
 
 		String dalleId = payload.get("id").asText();
 		String dalleUrl = payload.get("image").asText();
@@ -40,6 +48,21 @@ public class SaveDalleHandler implements MessageHandler {
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
+
+		Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(dalleId));
+		// TODO Exception
+		DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+
+		UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
+			.top(Integer.parseInt(top))
+			.height(Integer.parseInt(height))
+			.leftPos(Integer.parseInt(left))
+			.rotate(Integer.parseInt(rotate))
+			.width(Integer.parseInt(width))
+			.build();
+
+		diarySticker.updateDiarySticker(req);
+		diaryStickerRepository.save(diarySticker);
 
 		return response;
 	}

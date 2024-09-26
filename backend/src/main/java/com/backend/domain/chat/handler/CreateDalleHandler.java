@@ -1,21 +1,32 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.entity.HaruRoom;
+import com.backend.domain.chat.repository.HaruRoomRepository;
+import com.backend.domain.diary.entity.DiarySticker;
+import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class CreateDalleHandler implements MessageHandler {
+@RequiredArgsConstructor
+public class CreateDalleHandler implements RoomMessageHandler {
+
+	private final DiaryStickerRepository diaryStickerRepository;
+	private final HaruRoomRepository haruRoomRepository;
+
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
-		// dalleId 없는 경우 create
+	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
+
 		String dalleId = payload.get("id").asText();
 		String dalleUrl = payload.get("image").asText();
 		JsonNode dalleData = payload.get("position");
@@ -39,6 +50,22 @@ public class CreateDalleHandler implements MessageHandler {
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
+
+		Optional<HaruRoom> haruRoomOptional = haruRoomRepository.findById(roomId);
+		// TODO make exception
+		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
+
+		DiarySticker diarySticker = DiarySticker.builder()
+			.stickerImgUrl(dalleUrl)
+			.top(Integer.parseInt(top))
+			.leftPos(Integer.parseInt(left))
+			.width(Integer.parseInt(width))
+			.height(Integer.parseInt(height))
+			.rotate(Integer.parseInt(rotate))
+			.diary(haruRoom.getDiary())
+			.build();
+
+		diaryStickerRepository.save(diarySticker);
 
 		return response;
 	}

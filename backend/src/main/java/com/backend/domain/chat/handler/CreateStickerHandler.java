@@ -1,21 +1,32 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.entity.HaruRoom;
+import com.backend.domain.chat.repository.HaruRoomRepository;
+import com.backend.domain.diary.entity.DiarySticker;
+import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class CreateStickerHandler implements MessageHandler {
+@RequiredArgsConstructor
+public class CreateStickerHandler implements RoomMessageHandler {
+
+	private final DiaryStickerRepository diaryStickerRepository;
+	private final HaruRoomRepository haruRoomRepository;
+
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
-		// stickerId 없을 경우 생성? 뭘..?
+	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
+
 		String stickerId = payload.get("id").asText();
 		String stickerUrl = payload.get("image").asText();
 		JsonNode stickerData = payload.get("position");
@@ -39,6 +50,22 @@ public class CreateStickerHandler implements MessageHandler {
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
+
+		Optional<HaruRoom> haruRoomOptional = haruRoomRepository.findById(roomId);
+		// TODO make exception
+		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
+
+		DiarySticker diarySticker = DiarySticker.builder()
+			.stickerImgUrl(stickerUrl)
+			.top(Integer.parseInt(top))
+			.leftPos(Integer.parseInt(left))
+			.width(Integer.parseInt(width))
+			.height(Integer.parseInt(height))
+			.rotate(Integer.parseInt(rotate))
+			.diary(haruRoom.getDiary())
+			.build();
+
+		diaryStickerRepository.save(diarySticker);
 
 		return response;
 	}

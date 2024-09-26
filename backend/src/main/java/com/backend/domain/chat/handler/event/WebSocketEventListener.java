@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketEventListener {
 
 	// 일단 임시로 만듦. 세션 연결 시, roodId를 받아 인원 수를 관리하도록 구현할 것임.
+	// diaryId를 조회하여 내역들을 불러온다.
 	@EventListener
 	public void handleWebSocketConnectListener(SessionConnectedEvent event) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
