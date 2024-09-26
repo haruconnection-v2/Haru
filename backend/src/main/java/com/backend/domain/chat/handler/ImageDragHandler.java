@@ -16,7 +16,7 @@ public class ImageDragHandler implements MessageHandler {
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
 		String stickerId = payload.get("stickerId").asText();
-		JsonNode stickerData = payload.get("position");
+		JsonNode stickerData = payload.get("sticker_id");
 		String top = stickerData.get("top2").asText();
 		String left = stickerData.get("left2").asText();
 

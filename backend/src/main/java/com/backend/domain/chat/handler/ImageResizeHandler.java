@@ -16,7 +16,7 @@ public class ImageResizeHandler implements MessageHandler {
 
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
-		String stickerId = payload.get("id").asText();
+		String stickerId = payload.get("sticker_id").asText();
 		JsonNode stickerData = payload.get("position");
 		String width = stickerData.get("width2").asText();
 		String height = stickerData.get("height2").asText();

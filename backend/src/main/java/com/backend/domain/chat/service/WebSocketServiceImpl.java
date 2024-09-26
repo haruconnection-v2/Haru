@@ -30,7 +30,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -86,29 +88,21 @@ public class WebSocketServiceImpl implements WebSocketService {
 	}
 
 	@Override
-	public JsonNode registerHandler(String type, Map<String, JsonNode> payload) {
+	public JsonNode registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
 		MessageHandler handler = handlerMap.get(type);
 
-		//TODO
+		//TODO need refactor
 		if (handler == null) {
-			throw new IllegalArgumentException("No handler found for type: " + type);
+			RoomMessageHandler roomHandler = roomHandlerMap.get(type);
+
+			if (roomHandler == null) {
+				log.error("No handler found for type: {} in roomId: {}", type, roomId);
+				throw new IllegalArgumentException("No handler found for type: " + type + " in roomId: " + roomId);
+			}
+
+			return roomHandler.handle(roomId, payload);
 		}
 
 		return handler.handle(payload);
-	}
-
-	@Override
-	public JsonNode registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
-		RoomMessageHandler handler = roomHandlerMap.get(type);
-
-		//TODO
-		if (handler == null) {
-			throw new IllegalArgumentException("No handler found for type: " + type);
-		}
-		if (handler == null) {
-			throw new IllegalArgumentException("No handler found for roomId: " + roomId);
-		}
-
-		return handler.handle(roomId, payload);
 	}
 }

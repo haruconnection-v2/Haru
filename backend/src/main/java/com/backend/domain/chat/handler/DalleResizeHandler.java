@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DalleResizeHandler implements MessageHandler {
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
-		String dalleId = payload.get("id").asText();
+		String dalleId = payload.get("dalle_id").asText();
 		JsonNode dalleData = payload.get("position");
 		String width = dalleData.get("width2").asText();
 		String height = dalleData.get("height2").asText();

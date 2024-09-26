@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageRotateHandler implements MessageHandler {
 	@Override
 	public JsonNode handle(Map<String, JsonNode> payload) {
-		String stickerId = payload.get("id").asText();
+		String stickerId = payload.get("sticker_id").asText();
 		JsonNode stickerData = payload.get("position");
 		String rotate = stickerData.get("rotate2").asText();
 

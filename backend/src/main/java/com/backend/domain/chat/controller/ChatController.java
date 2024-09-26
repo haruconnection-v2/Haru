@@ -31,7 +31,7 @@ public class ChatController {
 
 		WebSocketMessageReq webSocketMessage = objectMapper.readValue(payload, WebSocketMessageReq.class);
 
-		JsonNode response = webSocketService.registerHandler(webSocketMessage.getType(), webSocketMessage.getPayload());
+		JsonNode response = webSocketService.registerHandler(roomId, webSocketMessage.getType(), webSocketMessage.getPayload());
 
 		if (response == null) {
 			throw new IllegalArgumentException("Handler did not return any response");

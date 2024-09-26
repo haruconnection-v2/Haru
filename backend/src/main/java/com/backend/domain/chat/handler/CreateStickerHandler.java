@@ -27,7 +27,7 @@ public class CreateStickerHandler implements RoomMessageHandler {
 	@Override
 	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
 
-		String stickerId = payload.get("id").asText();
+		String stickerId = payload.get("sticker_id").asText();
 		String stickerUrl = payload.get("image").asText();
 		JsonNode stickerData = payload.get("position");
 		String width = stickerData.get("width2").asText();

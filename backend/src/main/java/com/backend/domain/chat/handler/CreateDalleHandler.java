@@ -27,7 +27,7 @@ public class CreateDalleHandler implements RoomMessageHandler {
 	@Override
 	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
 
-		String dalleId = payload.get("id").asText();
+		String dalleId = payload.get("dalle_id").asText();
 		String dalleUrl = payload.get("image").asText();
 		JsonNode dalleData = payload.get("position");
 		String width = dalleData.get("width2").asText();
