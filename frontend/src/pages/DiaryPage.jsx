@@ -53,7 +53,7 @@ function DiaryPage() {
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [selectedDalle, setSelectedDalle] = useState(null);
   const selectedDateInfo = useSelectDateInfoStore((state) => state);
-  const { diary_id } = useParams();
+  const { diaryId } = useParams();
   const websocket = useRef(null);
   const { userInfoList, addUserInfo, getUserInfo, removeUserInfo } =
     useUserInfoStore();
@@ -86,14 +86,14 @@ function DiaryPage() {
   };
 
   useEffect(() => {
-    if (!diary_id) {
+    if (!diaryId) {
       console.log('diaryId가 설정되지 않았습니다.');
       return;
     }
 
     const newSocket = new WebSocket(
-      //`wss://${window.location.host}/ws/harurooms/${diary_id}/`, // 배포용
-      `ws://127.0.0.1:8000/ws/harurooms/${diary_id}/`, // 개발용
+      //`wss://${window.location.host}/ws/harurooms/${diaryId}/`, // 배포용
+      `ws://127.0.0.1:8000/ws/harurooms/${diaryId}/`, // 개발용
     );
     websocket.current = newSocket;
 
@@ -295,7 +295,7 @@ function DiaryPage() {
             websocket={websocket}
             diaryMonth={selectedDateInfo.selectedMonth}
             diaryDay={selectedDateInfo.selectedDay}
-            diaryId={diary_id}
+            diaryId={diaryId}
             setHostId={setHostId}
           />
         </WrapperInnerImg>

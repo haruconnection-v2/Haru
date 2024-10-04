@@ -34,24 +34,24 @@ function Case2({ diaryMonth, diaryDay }) {
   //일기생성
   const createDiary = async () => {
     try {
-      const response = await baseInstance.post('/diaries/', {
+      const response = await baseInstance.post('/diaries', {
         day: `${diaryDay}`,
-        diary_bg_id: inpageNum,
+        diaryBgId: inpageNum,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log('일기장 생성 성공');
-        handleMakeURL(response.data.diary_id);
-        setInnerPage(response.data.diary_bg_id);
+        handleMakeURL(response.data.data.diaryId);
+        setInnerPage(response.data.data.diaryBgId);
         setPage(3);
         setIconUpdate((prev) => prev + 1);
-        setDiaryId(response.data.diary_id);
+        setDiaryId(response.data.data.diaryId);
         console.log(
           'DateNotification page',
           useInnerPage.getState().innerPage,
           useDateNotificationStore.getState().page,
           '페이지로 넘어감',
         );
-        console.log('background Num: ', response.data.diary_bg_id);
+        console.log('background Num: ', response.data.data.diaryBgId);
       } else {
         console.log('일기장 생성 실패');
       }

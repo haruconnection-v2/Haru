@@ -60,7 +60,7 @@ class DiaryServiceImpl implements DiaryService {
 	@Transactional
 	public DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		Calendar calendar = getOrCreateCalendar(diaryRequest, session);
+		Calendar calendar = calendarService.getOrCreateCalendar(session);
 		validateDiaryNotExist(calendar.getId(), diaryRequest.getDay());
 		//room create;
 		Long roomId = 1L;
@@ -69,13 +69,6 @@ class DiaryServiceImpl implements DiaryService {
 		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar, snsLink));
 		String nickname = session.getAttribute("nickname").toString();
 		return toCreateDiaryResponse(diary, nickname);
-	}
-
-	private Calendar getOrCreateCalendar(DiaryCreateRequest diaryCreateRequest, HttpSession session) {
-		Calendar calendar = calendarRepository.findByMemberIdAndMonthYear((Long)session.getAttribute("memberId"), diaryCreateRequest.getMonthYear())
-			.orElse(calendarService.createAndSessionStoreCalendar(session, diaryCreateRequest.getMonthYear()));
-		session.setAttribute("calendarId", calendar.getId());
-		return calendar;
 	}
 
 	private void validateDiaryNotExist(Long calendarId, String day) {
@@ -95,7 +88,7 @@ class DiaryServiceImpl implements DiaryService {
 			.calendar(calendar)
 			.diaryBgId(diaryRequest.getDiaryBgId())
 			.day(diaryRequest.getDay())
-			.monthYear(diaryRequest.getMonthYear())
+			.monthYear(session.getAttribute("monthYear").toString())
 			.snsLink(snsLink)
 			.isExpiry(false)
 			.build();

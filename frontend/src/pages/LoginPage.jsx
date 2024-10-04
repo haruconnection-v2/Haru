@@ -43,17 +43,17 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await baseInstance.post('/members/login/', {
-        login_id: id,
-        password,
+      const response = await baseInstance.post('/members/login', {
+        loginId: id,
+        password: password,
       });
-      if (response.data.code === 'A001' && response.status === 200) {
+      if (response.data.code === 'M000' && response.status === 200) {
         console.log('로그인 성공');
         // 기존 상태를 삭제하고 새로운 상태를 저장
         localStorage.removeItem('loggedInUserId');
         userInfoStore.removeUserInfo(localStorage.getItem('loggedInUserId'));
 
-        const { nickname } = response.data; // API 응답에서 nickname 추출
+        const nickname = response.data.data; // API 응답에서 nickname 추출
         Swal.fire({
           icon: 'success',
           title: `환영합니다. ${nickname}님!`,
@@ -75,6 +75,7 @@ const LoginPage = () => {
         setShake(true);
         setTimeout(() => setShake(false), 400);
       } else {
+        console.log('API 호출 중 오류 발생 : ', error.response);
         console.error('API 호출 중 오류 발생 : ', error);
       }
     }
