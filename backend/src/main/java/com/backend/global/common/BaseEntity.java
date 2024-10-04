@@ -1,6 +1,7 @@
 package com.backend.global.common;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,6 +17,11 @@ import lombok.Getter;
 public class BaseEntity {
 	@CreatedDate
 	private String createdAt;
-	@LastModifiedDate private String updatedAt;
+	@LastModifiedDate
+	private String updatedAt;
 	private Boolean isDeleted = FALSE;
+
+	public void changeToDelete() {
+		this.isDeleted = TRUE;
+	}
 }

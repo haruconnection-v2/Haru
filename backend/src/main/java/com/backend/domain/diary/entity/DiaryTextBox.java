@@ -1,5 +1,6 @@
 package com.backend.domain.diary.entity;
 
+import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
 import com.backend.global.common.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -43,5 +44,13 @@ public class DiaryTextBox extends BaseEntity {
 		this.width = width;
 		this.height = height;
 		this.diary = diary;
+	}
+
+	public void updateDiaryTextBox(UpdateDiaryTextBoxReq updateDiaryTextBoxReq) {
+		this.content = updateDiaryTextBoxReq.getContent();
+		this.xcoor = updateDiaryTextBoxReq.getXcoor();
+		this.ycoor = updateDiaryTextBoxReq.getYcoor();
+		this.width = updateDiaryTextBoxReq.getWidth();
+		this.height = updateDiaryTextBoxReq.getHeight();
 	}
 }
