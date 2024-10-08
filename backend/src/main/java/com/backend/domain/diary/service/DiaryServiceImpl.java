@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.calendar.entity.Calendar;
 import com.backend.domain.calendar.repository.CalendarRepository;
 import com.backend.domain.calendar.service.CalendarService;
+import com.backend.domain.chat.entity.HaruRoom;
+import com.backend.domain.chat.repository.HaruRoomRepository;
 import com.backend.domain.diary.dto.DiaryCreateRequest;
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
@@ -31,6 +33,7 @@ class DiaryServiceImpl implements DiaryService {
 	private final DiaryRepository diaryRepository;
 	private final CalendarService calendarService;
 	private final CalendarRepository calendarRepository;
+	private final HaruRoomRepository haruRoomRepository;
 
 	//mapper에 member.nickname 추가예정
 	//session 로직 추가 예정
@@ -62,11 +65,17 @@ class DiaryServiceImpl implements DiaryService {
 		HttpSession session = request.getSession();
 		Calendar calendar = getOrCreateCalendar(diaryRequest, session);
 		validateDiaryNotExist(calendar.getId(), diaryRequest.getDay());
-		//room create;
-		Long roomId = 1L;
-		//make snsLink;
-        String snsLink = generateSnsLink(request, roomId);
-		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar, snsLink));
+
+		// snsLink 없이 저장.
+		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar));
+
+		HaruRoom haruRoom = generateHaruRoom(diary);
+		haruRoomRepository.save(haruRoom);
+
+		String snsLink = generateSnsLink(request, haruRoom.getId());
+		diary.updateDiary(snsLink);
+		diaryRepository.save(diary);
+
 		String nickname = session.getAttribute("nickname").toString();
 		return toCreateDiaryResponse(diary, nickname);
 	}
@@ -90,14 +99,20 @@ class DiaryServiceImpl implements DiaryService {
 		return String.format("http://%s:%d/rooms/%d", host, port, roomId);
 	}
 
-	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar, String snsLink) {
+	// 객체 생성 시 session은 필요 없어 보이는데 일단 지우지 않고 주석으로 남겨두겠습니다.
+	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar) {
 		return Diary.builder()
 			.calendar(calendar)
 			.diaryBgId(diaryRequest.getDiaryBgId())
 			.day(diaryRequest.getDay())
 			.monthYear(diaryRequest.getMonthYear())
-			.snsLink(snsLink)
 			.isExpiry(false)
+			.build();
+	}
+
+	private HaruRoom generateHaruRoom(Diary diary) {
+		return HaruRoom.builder()
+			.diary(diary)
 			.build();
 	}
 
