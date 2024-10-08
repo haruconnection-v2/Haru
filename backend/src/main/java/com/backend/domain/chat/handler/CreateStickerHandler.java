@@ -59,7 +59,7 @@ public class CreateStickerHandler implements RoomMessageHandler {
 		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
 
 		DiarySticker diarySticker = DiarySticker.builder()
-			.stickerImgUrl(stickerUrl)
+			.stickerImageUrl(stickerUrl)
 			.top(Integer.parseInt(top))
 			.leftPos(Integer.parseInt(left))
 			.width(Integer.parseInt(width))

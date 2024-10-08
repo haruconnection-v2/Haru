@@ -6,16 +6,16 @@ import lombok.Getter;
 @Getter
 public class CalendarStickerRequest {
 
-	private final String stickerImgUrl;
-	private final int top;
+	private final String stickerImageUrl;
+	private final int topPos;
 	private final int leftPos;
 	private final int width;
 	private final int height;
 	private final int rotate;
 	@Builder
-	public CalendarStickerRequest(String stickerImgUrl, int top, int leftPos, int width, int height, int rotate) {
-		this.stickerImgUrl = stickerImgUrl;
-		this.top = top;
+	public CalendarStickerRequest(String stickerImageUrl, int topPos, int leftPos, int width, int height, int rotate) {
+		this.stickerImageUrl = stickerImageUrl;
+		this.topPos = topPos;
 		this.leftPos = leftPos;
 		this.width = width;
 		this.height = height;

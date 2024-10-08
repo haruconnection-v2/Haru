@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.calendar.entity.Calendar;
-import com.backend.domain.calendar.repository.CalendarRepository;
 import com.backend.domain.calendar.service.CalendarService;
 import com.backend.domain.chat.entity.HaruRoom;
 import com.backend.domain.chat.repository.HaruRoomRepository;
@@ -32,7 +31,6 @@ class DiaryServiceImpl implements DiaryService {
 
 	private final DiaryRepository diaryRepository;
 	private final CalendarService calendarService;
-	private final CalendarRepository calendarRepository;
 	private final HaruRoomRepository haruRoomRepository;
 
 	//mapper에 member.nickname 추가예정
@@ -63,28 +61,19 @@ class DiaryServiceImpl implements DiaryService {
 	@Transactional
 	public DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		Calendar calendar = getOrCreateCalendar(diaryRequest, session);
+		Calendar calendar = calendarService.getOrCreateCalendar(session);
 		validateDiaryNotExist(calendar.getId(), diaryRequest.getDay());
 
-		// snsLink 없이 저장.
+		// diary, haruRoom entity 연관관계로 인해 diary 생성 후 link를 생성해야 함.
 		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar));
-
 		HaruRoom haruRoom = generateHaruRoom(diary);
-		haruRoomRepository.save(haruRoom);
 
 		String snsLink = generateSnsLink(request, haruRoom.getId());
-		diary.updateDiary(snsLink);
+		diary.updateDiaryLink(snsLink);
 		diaryRepository.save(diary);
 
 		String nickname = session.getAttribute("nickname").toString();
 		return toCreateDiaryResponse(diary, nickname);
-	}
-
-	private Calendar getOrCreateCalendar(DiaryCreateRequest diaryCreateRequest, HttpSession session) {
-		Calendar calendar = calendarRepository.findByMemberIdAndMonthYear((Long)session.getAttribute("memberId"), diaryCreateRequest.getMonthYear())
-			.orElse(calendarService.createAndSessionStoreCalendar(session, diaryCreateRequest.getMonthYear()));
-		session.setAttribute("calendarId", calendar.getId());
-		return calendar;
 	}
 
 	private void validateDiaryNotExist(Long calendarId, String day) {
@@ -99,21 +88,21 @@ class DiaryServiceImpl implements DiaryService {
 		return String.format("http://%s:%d/rooms/%d", host, port, roomId);
 	}
 
-	// 객체 생성 시 session은 필요 없어 보이는데 일단 지우지 않고 주석으로 남겨두겠습니다.
 	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar) {
 		return Diary.builder()
 			.calendar(calendar)
 			.diaryBgId(diaryRequest.getDiaryBgId())
 			.day(diaryRequest.getDay())
-			.monthYear(diaryRequest.getMonthYear())
+			.monthYear(session.getAttribute("monthYear").toString())
 			.isExpiry(false)
 			.build();
 	}
 
 	private HaruRoom generateHaruRoom(Diary diary) {
-		return HaruRoom.builder()
+		HaruRoom haruRoom = HaruRoom.builder()
 			.diary(diary)
 			.build();
+		return haruRoomRepository.save(haruRoom);
 	}
 
 	@Override

@@ -12,7 +12,8 @@ import jakarta.servlet.http.HttpSession;
 @Component
 public interface CalendarService {
 	CalendarResponse getCalendarData(String monthYear, HttpServletRequest request);
+
 	void updateCalendarSticker(CalendarStickerRequest calendarStickerRequest, HttpServletRequest request);
 
-	Calendar createAndSessionStoreCalendar(HttpSession session, String monthYear);
+	Calendar getOrCreateCalendar(HttpSession session);
 }

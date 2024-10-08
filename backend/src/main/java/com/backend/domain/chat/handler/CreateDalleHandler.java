@@ -59,7 +59,7 @@ public class CreateDalleHandler implements RoomMessageHandler {
 		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
 
 		DiarySticker diarySticker = DiarySticker.builder()
-			.stickerImgUrl(dalleUrl)
+			.stickerImageUrl(dalleUrl)
 			.top(Integer.parseInt(top))
 			.leftPos(Integer.parseInt(left))
 			.width(Integer.parseInt(width))

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class DiaryTextBoxResDto {
-	private final Long id;
+	private final Long textboxId;
 	private final String writer;
 	private final String content;
 	private final int xcoor;
@@ -13,8 +13,8 @@ public class DiaryTextBoxResDto {
 	private final int width;
 	private final int height;
 	@Builder
-	public DiaryTextBoxResDto(Long id, String writer, String content, int xcoor, int ycoor, int width, int height) {
-		this.id = id;
+	public DiaryTextBoxResDto(Long textboxId, String writer, String content, int xcoor, int ycoor, int width, int height) {
+		this.textboxId = textboxId;
 		this.writer = writer;
 		this.content = content;
 		this.xcoor = xcoor;
