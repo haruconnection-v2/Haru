@@ -1,5 +1,7 @@
 package com.backend.domain.chat.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -31,7 +33,7 @@ public class ChatController {
 
 		WebSocketMessageReq webSocketMessage = objectMapper.readValue(payload, WebSocketMessageReq.class);
 
-		JsonNode response = webSocketService.registerHandler(roomId, webSocketMessage.getType(), webSocketMessage.getPayload());
+		CompletableFuture<JsonNode> response = webSocketService.registerHandler(roomId, webSocketMessage.getType(), webSocketMessage.getPayload());
 
 		if (response == null) {
 			throw new IllegalArgumentException("Handler did not return any response");

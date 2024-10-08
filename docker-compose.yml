@@ -24,8 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
     ports:
       - "8080:8080"
     networks:
@@ -55,26 +54,20 @@ services:
     ports:
       - "80:80"
     volumes:
-      - build_folder:/var/www/frontend
+      - build_folder:/var/www/frontend:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/logs:/var/log/nginx
-
-    #      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    #      - ./certbot/conf:/etc/letsencrypt:rw
-    #      - ./certbot/www:/var/www/certbot:rw
+    tty: true
     depends_on:
-      frontend:
-        condition: service_healthy
-    expose:
-      - '80'
+      - frontend
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     networks:
       - haru-network
-
 
 networks:
   haru-network:
     driver: bridge
 
 volumes:
-  build_folder: { }
+  build_folder:
   mysql-data:

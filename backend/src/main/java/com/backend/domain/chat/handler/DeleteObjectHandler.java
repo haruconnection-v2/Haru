@@ -3,7 +3,9 @@ package com.backend.domain.chat.handler;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.diary.entity.DiarySticker;
@@ -25,8 +27,9 @@ public class DeleteObjectHandler implements MessageHandler {
 	private final DiaryStickerRepository diaryStickerRepository;
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
 		String objectType = payload.get("object_type").asText();
 		String objectId = payload.get("object_id").asText();
@@ -53,6 +56,6 @@ public class DeleteObjectHandler implements MessageHandler {
 			diaryTextBoxRepository.save(diaryTextBox);
 		}
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

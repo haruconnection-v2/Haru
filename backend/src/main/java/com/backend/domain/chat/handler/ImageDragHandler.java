@@ -1,6 +1,7 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ImageDragHandler implements MessageHandler {
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 		String stickerId = payload.get("stickerId").asText();
 		JsonNode stickerData = payload.get("sticker_id");
 		String top = stickerData.get("top2").asText();
@@ -31,6 +32,6 @@ public class ImageDragHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

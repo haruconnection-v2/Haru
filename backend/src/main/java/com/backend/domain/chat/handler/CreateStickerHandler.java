@@ -2,7 +2,9 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.entity.HaruRoom;
@@ -24,8 +26,9 @@ public class CreateStickerHandler implements RoomMessageHandler {
 	private final DiaryStickerRepository diaryStickerRepository;
 	private final HaruRoomRepository haruRoomRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
 
 		String stickerId = payload.get("sticker_id").asText();
 		String stickerUrl = payload.get("image").asText();
@@ -67,6 +70,6 @@ public class CreateStickerHandler implements RoomMessageHandler {
 
 		diaryStickerRepository.save(diarySticker);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

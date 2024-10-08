@@ -3,7 +3,9 @@ package com.backend.domain.chat.handler;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
@@ -25,8 +27,9 @@ public class StopObjectHandler implements MessageHandler {
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final DiaryStickerRepository diaryStickerRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 		String objectType = payload.get("object_type").asText();
 		// 중복 코드 메서드화 하기
 		if (Objects.equals(objectType, "sticker")) {
@@ -81,6 +84,6 @@ public class StopObjectHandler implements MessageHandler {
 
 		}
 
-		return null;
+		return CompletableFuture.completedFuture(null);
 	}
 }

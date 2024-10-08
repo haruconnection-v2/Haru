@@ -2,7 +2,9 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
@@ -22,8 +24,9 @@ public class SaveTextHandler implements MessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
 		String textId = payload.get("id").asText();
 		String content = payload.get("content").asText();
@@ -64,6 +67,6 @@ public class SaveTextHandler implements MessageHandler {
 		diaryTextBox.updateDiaryTextBox(req);
 		diaryTextBoxRepository.save(diaryTextBox);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

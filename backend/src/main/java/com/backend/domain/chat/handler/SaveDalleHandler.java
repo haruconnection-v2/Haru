@@ -2,7 +2,9 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
@@ -22,8 +24,9 @@ public class SaveDalleHandler implements MessageHandler {
 
 	private final DiaryStickerRepository diaryStickerRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
 		String dalleId = payload.get("id").asText();
 		String dalleUrl = payload.get("image").asText();
@@ -64,6 +67,6 @@ public class SaveDalleHandler implements MessageHandler {
 		diarySticker.updateDiarySticker(req);
 		diaryStickerRepository.save(diarySticker);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

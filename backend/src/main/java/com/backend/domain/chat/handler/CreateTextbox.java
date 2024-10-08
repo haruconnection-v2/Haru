@@ -2,7 +2,9 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.entity.HaruRoom;
@@ -24,8 +26,9 @@ public class CreateTextbox implements RoomMessageHandler {
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final HaruRoomRepository haruRoomRepository;
 
+	@Async
 	@Override
-	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
 
 		String textId = payload.get("id").asText();
 		JsonNode textData = payload.get("position");
@@ -65,6 +68,6 @@ public class CreateTextbox implements RoomMessageHandler {
 
 		diaryTextBoxRepository.save(newDiaryTextBox);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }
