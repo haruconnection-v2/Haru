@@ -37,7 +37,8 @@ public class SecurityConfig {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(List.of(
 			"http://localhost",
-			"https://jiangxy.github.io"
+			"https://jiangxy.github.io",
+			"http://localhost:5173"
 		));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));

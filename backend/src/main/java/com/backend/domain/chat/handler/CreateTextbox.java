@@ -9,12 +9,14 @@ import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.entity.HaruRoom;
 import com.backend.domain.chat.repository.HaruRoomRepository;
+import com.backend.domain.diary.entity.Diary;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +32,6 @@ public class CreateTextbox implements RoomMessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
 
-		String textId = payload.get("id").asText();
 		JsonNode textData = payload.get("position");
 		String x = textData.get("x").asText();
 		String y = textData.get("y").asText();
@@ -43,21 +44,20 @@ public class CreateTextbox implements RoomMessageHandler {
 		positionNode.put("width", width);
 		positionNode.put("height", height);
 
-		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "create_textbox");
-		response.put("text_id", textId);
-		response.set("position", positionNode);
-
-		log.info("Response created: {}", response);
-
 		Optional<HaruRoom> haruRoomOptional = haruRoomRepository.findById(roomId);
 		// TODO make exception
 		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
 
-		// 사용자를 식별할 수 있는 토큰이라던지 관련 로직이 필요할 듯
-		// 생성 초기 content는 null로 들어가야 할 듯.
+
+		// 이미 일기에 자신의 텍스트박스가 존재하는 경우
+		Diary diary = haruRoom.getDiary();
+		Boolean bool = diaryTextBoxRepository.existsByDiary(diary);
+		if (bool) {
+			log.info("already exists");
+			//TODO exception
+		}
+
 		DiaryTextBox newDiaryTextBox = DiaryTextBox.builder()
-			.writer("1")
 			.content(null)
 			.xcoor(Integer.parseInt(x))
 			.ycoor(Integer.parseInt(y))
@@ -67,6 +67,15 @@ public class CreateTextbox implements RoomMessageHandler {
 			.build();
 
 		diaryTextBoxRepository.save(newDiaryTextBox);
+
+		ObjectNode response = JsonNodeFactory.instance.objectNode();
+		response.put("type", "create_textbox");
+		response.put("text_id", newDiaryTextBox.getId());
+		response.set("position", positionNode);
+
+		log.info("Response created: {}", response);
+
+
 
 		return CompletableFuture.completedFuture(response);
 	}

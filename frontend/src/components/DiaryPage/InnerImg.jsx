@@ -35,8 +35,8 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
       try {
         const response = await baseInstance.get(`/diaries/${diaryId}`);
         if (response.data) {
-          const responseMonth = response.data.diary_data.year_month;
-
+          const responseMonth = response.data.data.monthYear;
+          console.log(responseMonth);
           const month = responseMonth.split('-')[1];
           const numericMonth = month.startsWith('0')
             ? parseInt(month[1])
@@ -47,7 +47,7 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
           console.log(
             `${numericMonth}월 ${response.data.day}일 다이어리 조회 성공!`,
           );
-          const diaryBgId = response.data.diary_data.diary_bg_id;
+          const diaryBgId = response.data.data.diaryBgId;
           setInnerPage(diaryBgId);
           setHostName(response.data.nickname);
           setHostId(response.data.login_id);
@@ -155,10 +155,11 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
           key={text.id}
           textId={text.id}
           bounds={diaryRef}
-          websocket={websocket}
+          stomp={websocket}
           username={hostName}
           diaryMonth={diaryMonth}
           diaryDay={diaryDay}
+          diaryId={diaryId}
         />
       ))}
       {dalles.map((dalle) => (

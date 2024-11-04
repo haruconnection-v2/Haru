@@ -12,9 +12,10 @@ function TextBox({
   username,
   textId,
   bounds,
-  websocket,
+  stomp,
   diaryMonth,
   diaryDay,
+  diaryId,
 }) {
   const texts = useTextStore((state) => state.texts);
   const updateText = useTextStore((state) => state.updateText);
@@ -47,8 +48,9 @@ function TextBox({
           useDiaryContent.setState({ diaryContent: userText });
           console.log('저장된 content:', userText);
 
-          websocket.current.send(
-            JSON.stringify({
+          stomp.current.publish({
+            destination: `/send/${diaryId}`,
+            body: JSON.stringify({
               type: 'save_text',
               id: textId,
               content: text.content,
@@ -60,7 +62,7 @@ function TextBox({
                 height: text.height,
               },
             }),
-          );
+          });
           swalWithBootstrapButtons.fire({
             title: '저장되었어요!',
             icon: 'success',
@@ -97,8 +99,8 @@ function TextBox({
     );
   }
 
-  // WebSocket 메시지 전송 함수
-  const sendWebSocketMessage = (
+  // stomp 메시지 전송 함수
+  const sendStompMessage = (
     type,
     updatedPosition,
     content = null,
@@ -118,11 +120,14 @@ function TextBox({
       message.nickname = nickname;
     }
 
-    websocket.current.send(JSON.stringify(message));
+    stomp.current.publish({
+      destination: `/send/${diaryId}`,
+      body: JSON.stringify(message),
+    });
   };
 
   const handleDrag = (e, d) => {
-    sendWebSocketMessage('text_drag', {
+    sendStompMessage('text_drag', {
       x: Math.round(d.x),
       y: Math.round(d.y),
     });
@@ -132,7 +137,7 @@ function TextBox({
     const width = Math.round(parseFloat(ref.style.width));
     const height = Math.round(parseFloat(ref.style.height));
 
-    sendWebSocketMessage('text_resize', {
+    sendStompMessage('text_resize', {
       width: width,
       height: height,
     });
@@ -140,18 +145,19 @@ function TextBox({
 
   const onDelete = () => {
     // 서버로 삭제 요청 보내기
-    websocket.current.send(
-      JSON.stringify({
+    stomp.current.publish({
+      destination: `/send/${diaryId}`,
+      body: JSON.stringify({
         type: 'delete_object',
         object_type: 'text',
         object_id: textId,
       }),
-    );
+    });
   };
 
   const handleCompositionEnd = (e) => {
     console.log('Composition ended');
-    sendWebSocketMessage('text_input', null, e.target.value);
+    sendStompMessage('text_input', null, e.target.value);
   };
 
   const handleTextChange = (e) => {
@@ -162,7 +168,7 @@ function TextBox({
 
   const handleNicknameCompositionEnd = (e) => {
     console.log('Nickname composition ended');
-    sendWebSocketMessage('nickname_input', null, null, e.target.value);
+    sendStompMessage('nickname_input', null, null, e.target.value);
   };
 
   const handleNicknameChange = (e) => {
