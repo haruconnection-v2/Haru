@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -52,9 +54,9 @@ public class SaveStickerHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(stickerId));
-		// TODO Exception
-		DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+		DiarySticker diarySticker = diaryStickerRepository.findById(Long.valueOf(stickerId)).orElseThrow(
+			() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
+		);
 
 		UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
 			.top(Integer.parseInt(top))

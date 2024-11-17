@@ -12,6 +12,8 @@ import com.backend.domain.chat.repository.HaruRoomRepository;
 import com.backend.domain.diary.entity.Diary;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,18 +45,9 @@ public class CreateTextbox implements RoomMessageHandler {
 		positionNode.put("width", width);
 		positionNode.put("height", height);
 
-		Optional<HaruRoom> haruRoomOptional = haruRoomRepository.findById(roomId);
-		// TODO make exception
-		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
-
-		// 이미 일기에 자신의 텍스트박스가 존재하는 경우
-		Diary diary = haruRoom.getDiary();
-
-		Boolean bool = diaryTextBoxRepository.existsByDiary(diary);
-		if (bool) {
-			log.info("already exists");
-			//TODO exception
-		}
+		HaruRoom haruRoom = haruRoomRepository.findById(roomId).orElseThrow(
+			() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND)
+		);
 
 		DiaryTextBox newDiaryTextBox = DiaryTextBox.builder()
 			.content(null)
@@ -73,8 +66,6 @@ public class CreateTextbox implements RoomMessageHandler {
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
-
-
 
 		return CompletableFuture.completedFuture(response);
 	}

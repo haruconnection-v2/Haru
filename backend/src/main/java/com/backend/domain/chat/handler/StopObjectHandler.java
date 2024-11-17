@@ -14,6 +14,8 @@ import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
@@ -42,9 +44,9 @@ public class StopObjectHandler implements MessageHandler {
 			String left = stickerData.get("left2").asText();
 			String rotate = stickerData.get("rotate2").asText();
 
-			Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(stickerId));
-			// TODO Exception
-			DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+			DiarySticker diarySticker = diaryStickerRepository.findById(Long.valueOf(stickerId)).orElseThrow(
+				() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
+			);
 
 			UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
 				.top(Integer.parseInt(top))
@@ -67,9 +69,9 @@ public class StopObjectHandler implements MessageHandler {
 			String width = textData.get("width").asText();
 			String height = textData.get("height").asText();
 
-			Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.parseLong(textId));
-			// TODO Exception
-			DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+			DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.parseLong(textId)).orElseThrow(
+				() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
+			);
 
 			UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 				.content(content)

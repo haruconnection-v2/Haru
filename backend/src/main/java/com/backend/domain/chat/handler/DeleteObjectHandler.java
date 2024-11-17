@@ -12,6 +12,8 @@ import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,16 +44,18 @@ public class DeleteObjectHandler implements MessageHandler {
 		log.info("Response created: {}", response);
 
 		if (Objects.equals(objectType, "sticker") || Objects.equals(objectType, "dalle")) {
-			Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(objectId));
-			//TODO Exception
-			DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+
+			DiarySticker diarySticker = diaryStickerRepository.findById(Long.valueOf(objectId)).orElseThrow(
+				() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
+			);
 			diarySticker.changeToDelete();
 			diaryStickerRepository.save(diarySticker);
 
 		} else if (Objects.equals(objectType, "textbox")) {
-			Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.valueOf(objectId));
-			//TODO Exception
-			DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+
+			DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.valueOf(objectId)).orElseThrow(
+				() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
+			);
 			diaryTextBox.changeToDelete();
 			diaryTextBoxRepository.save(diaryTextBox);
 		}

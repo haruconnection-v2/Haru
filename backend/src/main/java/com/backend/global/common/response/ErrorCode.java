@@ -29,8 +29,12 @@ public enum ErrorCode {
 	CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "해당 달력을 찾을 수 없습니다."),
 
 	// TextBox
+	TEXT_BOX_NOT_FOUND(HttpStatus.NOT_FOUND, "T004", "해당 텍스트 박스를 ��을 수 없습니다."),
+	// Room
+	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "R004", "해당 방을 찾을 수 없습니다."),
+
 	// Sticker
-	NOT_FOUND_STICKER(HttpStatus.NOT_FOUND, "S004", "해당 스티커를 찾을 수 없습니다."),
+	STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "S004", "해당 스티커를 찾을 수 없습니다."),
 	;
 	private final HttpStatus status;
 	private final String message;

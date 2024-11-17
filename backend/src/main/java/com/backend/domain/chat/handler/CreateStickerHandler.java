@@ -11,6 +11,8 @@ import com.backend.domain.chat.entity.HaruRoom;
 import com.backend.domain.chat.repository.HaruRoomRepository;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,9 +56,9 @@ public class CreateStickerHandler implements RoomMessageHandler {
 
 		log.info("Response created: {}", response);
 
-		Optional<HaruRoom> haruRoomOptional = haruRoomRepository.findById(roomId);
-		// TODO make exception
-		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
+		HaruRoom haruRoom = haruRoomRepository.findById(roomId).orElseThrow(
+			() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
+		);
 
 		DiarySticker diarySticker = DiarySticker.builder()
 			.stickerImageUrl(stickerUrl)

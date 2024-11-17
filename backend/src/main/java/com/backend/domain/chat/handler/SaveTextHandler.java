@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -52,9 +54,9 @@ public class SaveTextHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.parseLong(textId));
-		// TODO Exception
-		DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+		DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.parseLong(textId)).orElseThrow(
+			() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
+		);
 
 		UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 			.content(content)

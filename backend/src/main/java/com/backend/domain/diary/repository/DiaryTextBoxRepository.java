@@ -8,5 +8,5 @@ import com.backend.domain.diary.entity.DiaryTextBox;
 
 @Repository
 public interface DiaryTextBoxRepository extends JpaRepository<DiaryTextBox, Long> {
-	Boolean existsByDiary(Diary diary);
+
 }
