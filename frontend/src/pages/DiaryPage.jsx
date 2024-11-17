@@ -215,12 +215,12 @@ function DiaryPage() {
               ...data.position,
             });
           } else if (data.type === 'text_drag') {
-            // console.log('텍스트 드래그 발생');
+            console.log('텍스트 드래그 발생');
             useTextStore
               .getState()
               .updateText({ id: data.text_id, ...data.position });
           } else if (data.type === 'text_resize') {
-            // console.log('텍스트 리사이즈 발생');
+            console.log('텍스트 리사이즈 발생');
             useTextStore
               .getState()
               .updateText({ id: data.text_id, ...data.position });
@@ -298,12 +298,12 @@ function DiaryPage() {
           />
         </WrapperInnerImg>
         <WrapperRightSticker>
-          <RightSticker
+          {/* <RightSticker
             diaryMonth={selectedDateInfo.selectedMonth}
             diaryDay={selectedDateInfo.selectedDay}
             onDalleSelect={handleDalleSelect}
             websocket={stompClient}
-          />
+          /> */}
         </WrapperRightSticker>
         <WrapperDHomeButton>{hostCheck && <DHomeButton />}</WrapperDHomeButton>
         <WrapperSaveButton>

@@ -31,7 +31,6 @@ public class CreateTextbox implements RoomMessageHandler {
 	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
-
 		JsonNode textData = payload.get("position");
 		String x = textData.get("x").asText();
 		String y = textData.get("y").asText();
@@ -48,9 +47,9 @@ public class CreateTextbox implements RoomMessageHandler {
 		// TODO make exception
 		HaruRoom haruRoom = haruRoomOptional.orElseThrow();
 
-
 		// 이미 일기에 자신의 텍스트박스가 존재하는 경우
 		Diary diary = haruRoom.getDiary();
+
 		Boolean bool = diaryTextBoxRepository.existsByDiary(diary);
 		if (bool) {
 			log.info("already exists");
@@ -70,7 +69,7 @@ public class CreateTextbox implements RoomMessageHandler {
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
 		response.put("type", "create_textbox");
-		response.put("text_id", newDiaryTextBox.getId());
+		response.put("text_id", newDiaryTextBox.getId().toString());
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
