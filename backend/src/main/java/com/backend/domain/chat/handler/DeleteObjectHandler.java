@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.util.DiaryStickerUtils;
+import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
@@ -28,6 +30,8 @@ public class DeleteObjectHandler implements MessageHandler {
 
 	private final DiaryStickerRepository diaryStickerRepository;
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
+	private final DiaryStickerUtils diaryStickerUtils;
+	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
 	@Async
 	@Override
@@ -45,17 +49,14 @@ public class DeleteObjectHandler implements MessageHandler {
 
 		if (Objects.equals(objectType, "sticker") || Objects.equals(objectType, "dalle")) {
 
-			DiarySticker diarySticker = diaryStickerRepository.findById(Long.valueOf(objectId)).orElseThrow(
-				() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
-			);
+			DiarySticker diarySticker = diaryStickerUtils.fetchDiarySticker(objectId);
 			diarySticker.changeToDelete();
 			diaryStickerRepository.save(diarySticker);
 
 		} else if (Objects.equals(objectType, "textbox")) {
 
-			DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.valueOf(objectId)).orElseThrow(
-				() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
-			);
+			DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(objectId);
+
 			diaryTextBox.changeToDelete();
 			diaryTextBoxRepository.save(diaryTextBox);
 		}

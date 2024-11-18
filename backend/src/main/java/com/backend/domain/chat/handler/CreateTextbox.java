@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.entity.HaruRoom;
 import com.backend.domain.chat.repository.HaruRoomRepository;
+import com.backend.domain.chat.util.HaruRoomUtils;
+import com.backend.domain.chat.util.PositionUtils;
 import com.backend.domain.diary.entity.Diary;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
@@ -28,33 +30,22 @@ import lombok.extern.slf4j.Slf4j;
 public class CreateTextbox implements RoomMessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
-	private final HaruRoomRepository haruRoomRepository;
+	private final HaruRoomUtils haruRoomUtils;
 
 	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
-		JsonNode textData = payload.get("position");
-		String x = textData.get("x").asText();
-		String y = textData.get("y").asText();
-		String width = textData.get("width").asText();
-		String height = textData.get("height").asText();
 
-		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("x", x);
-		positionNode.put("y", y);
-		positionNode.put("width", width);
-		positionNode.put("height", height);
+		ObjectNode positionNode = PositionUtils.extractPositionData(payload);
 
-		HaruRoom haruRoom = haruRoomRepository.findById(roomId).orElseThrow(
-			() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND)
-		);
+		HaruRoom haruRoom = haruRoomUtils.fetchHaruRoom(roomId);
 
 		DiaryTextBox newDiaryTextBox = DiaryTextBox.builder()
 			.content(null)
-			.xcoor(Integer.parseInt(x))
-			.ycoor(Integer.parseInt(y))
-			.width(Integer.parseInt(width))
-			.height(Integer.parseInt(height))
+			.xcoor(positionNode.get("x").asInt())
+			.ycoor(positionNode.get("y").asInt())
+			.width(positionNode.get("width").asInt())
+			.height(positionNode.get("height").asInt())
 			.diary(haruRoom.getDiary())
 			.build();
 

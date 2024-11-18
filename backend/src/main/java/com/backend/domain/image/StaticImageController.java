@@ -24,7 +24,7 @@ public class StaticImageController {
 	public ResponseEntity<ResultResponse<String>> getStaticImage(
 		@RequestParam("page") Long stickerPageNum) {
 		String stBgImgUrl = String.valueOf(staticImageRepository.findById(stickerPageNum)
-																.orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STICKER)));
+																.orElseThrow(() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)));
 		ResultResponse<String> resultResponse = ResultResponse.of(FIND_ST_STICKER_SUCCESS, stBgImgUrl);
 		return ResponseEntity.status(FIND_ST_STICKER_SUCCESS.getHttpStatus()).body(resultResponse);
 	}

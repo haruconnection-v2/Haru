@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
+import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
 import com.backend.global.common.exception.NotFoundException;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SaveTextHandler implements MessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
+	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
 	@Async
 	@Override
@@ -54,9 +56,7 @@ public class SaveTextHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.parseLong(textId)).orElseThrow(
-			() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
-		);
+		DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(textId);
 
 		UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 			.content(content)

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
+import com.backend.domain.chat.util.DiaryStickerUtils;
+import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
@@ -28,6 +30,8 @@ public class StopObjectHandler implements MessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final DiaryStickerRepository diaryStickerRepository;
+	private final DiaryStickerUtils diaryStickerUtils;
+	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
 	@Async
 	@Override
@@ -44,9 +48,7 @@ public class StopObjectHandler implements MessageHandler {
 			String left = stickerData.get("left2").asText();
 			String rotate = stickerData.get("rotate2").asText();
 
-			DiarySticker diarySticker = diaryStickerRepository.findById(Long.valueOf(stickerId)).orElseThrow(
-				() -> new NotFoundException(ErrorCode.STICKER_NOT_FOUND)
-			);
+			DiarySticker diarySticker = diaryStickerUtils.fetchDiarySticker(stickerId);
 
 			UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
 				.top(Integer.parseInt(top))
@@ -69,9 +71,7 @@ public class StopObjectHandler implements MessageHandler {
 			String width = textData.get("width").asText();
 			String height = textData.get("height").asText();
 
-			DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(Long.parseLong(textId)).orElseThrow(
-				() -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
-			);
+			DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(textId);
 
 			UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 				.content(content)
