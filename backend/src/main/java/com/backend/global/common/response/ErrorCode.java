@@ -15,8 +15,8 @@ public enum ErrorCode {
 	// Auth
 	// Member
 	MEMBER_LOGIN_CONFLICT(HttpStatus.CONFLICT, "M009", "이미 로그인 되어 있습니다."),
-	MEMBER_LOGOUT_CONFLICT(HttpStatus.ACCEPTED, "M202", "이미 로그아웃 되어 있습니다."),
-	MEMBER_LOGIN_ID_CONFLICT(HttpStatus.CONFLICT, "M109", "이미 존재하는 아이디입니다."),
+	MEMBER_LOGOUT_CONFLICT(HttpStatus.CONFLICT, "M109", "이미 로그아웃 되어 있습니다."),
+	MEMBER_LOGIN_ID_CONFLICT(HttpStatus.CONFLICT, "M209", "이미 존재하는 아이디입니다."),
 	MEMBER_NICKNAME_CONFLICT(HttpStatus.CONFLICT, "M309", "이미 존재하는 닉네임입니다."),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "해당 회원을 찾을 수 없습니다."),
 	// Diary
@@ -29,12 +29,8 @@ public enum ErrorCode {
 	CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "해당 달력을 찾을 수 없습니다."),
 
 	// TextBox
-	TEXT_BOX_NOT_FOUND(HttpStatus.NOT_FOUND, "T004", "해당 텍스트 박스를 ��을 수 없습니다."),
-	// Room
-	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "R004", "해당 방을 찾을 수 없습니다."),
-
 	// Sticker
-	STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "S004", "해당 스티커를 찾을 수 없습니다."),
+	NOT_FOUND_STICKER(HttpStatus.NOT_FOUND, "S004", "해당 스티커를 찾을 수 없습니다."),
 	;
 	private final HttpStatus status;
 	private final String message;

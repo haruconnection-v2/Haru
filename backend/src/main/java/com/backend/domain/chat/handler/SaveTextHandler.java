@@ -2,17 +2,12 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
-import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
-import com.backend.global.common.exception.NotFoundException;
-import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,11 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 public class SaveTextHandler implements MessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
-	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
-	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 
 		String textId = payload.get("id").asText();
 		String content = payload.get("content").asText();
@@ -56,7 +49,9 @@ public class SaveTextHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(textId);
+		Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.parseLong(textId));
+		// TODO Exception
+		DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
 
 		UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 			.content(content)
@@ -69,6 +64,6 @@ public class SaveTextHandler implements MessageHandler {
 		diaryTextBox.updateDiaryTextBox(req);
 		diaryTextBoxRepository.save(diaryTextBox);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

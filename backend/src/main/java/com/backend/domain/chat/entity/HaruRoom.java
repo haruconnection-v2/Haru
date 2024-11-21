@@ -11,16 +11,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @Entity
-@Builder
-@AllArgsConstructor
+// @Builder
+// @AllArgsConstructor
 public class HaruRoom extends BaseEntity {
 
 	@Id

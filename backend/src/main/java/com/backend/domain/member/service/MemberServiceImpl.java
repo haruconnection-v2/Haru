@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.member.dto.LoginRequest;
-import com.backend.domain.member.dto.SignUpRequest;
+import com.backend.domain.member.dto.SingUpRequest;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.common.exception.BadRequestException;
@@ -22,25 +22,25 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public void singUp(SignUpRequest signUpRequest, HttpServletRequest request) {
+	public void singUp(SingUpRequest singUpRequest, HttpServletRequest request) {
 		//loginId, nickname, password 중복, 형식 확인은 따로 api처리 필요
-		if (memberRepository.existsByLoginId(signUpRequest.getLoginId())) {
+		if (memberRepository.existsByLoginId(singUpRequest.getLoginId())) {
 			throw new BadRequestException(ErrorCode.MEMBER_LOGIN_ID_CONFLICT);
 		}
-		if (memberRepository.existsByNickname(signUpRequest.getNickname())) {
+		if (memberRepository.existsByNickname(singUpRequest.getNickname())) {
 			throw new BadRequestException(ErrorCode.MEMBER_NICKNAME_CONFLICT);
 		}
 		Member member = Member.builder()
-			.loginId(signUpRequest.getLoginId())
-			.nickname(signUpRequest.getNickname())
-			.password(signUpRequest.getPassword())
+			.loginId(singUpRequest.getLoginId())
+			.nickname(singUpRequest.getNickname())
+			.password(singUpRequest.getPassword())
 			.build();
 		memberRepository.save(member);
 	}
 
 	@Override
 	public String login(LoginRequest loginRequest, HttpServletRequest request) {
-		if (request.getSession().getAttribute("memberId") == loginRequest.getLoginId()) {
+		if (request.getSession().getAttribute("memberId") != null) {
 			throw new BadRequestException(ErrorCode.MEMBER_LOGIN_CONFLICT);
 		}
 		String loginId = loginRequest.getLoginId();

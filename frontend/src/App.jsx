@@ -17,7 +17,7 @@ function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/diary/:diaryId" element={<DiaryPage />} />
+        <Route path="/diary/:diary_id" element={<DiaryPage />} />
         <Route path="/past" element={<PastPage />} />
       </Routes>
     </Router>

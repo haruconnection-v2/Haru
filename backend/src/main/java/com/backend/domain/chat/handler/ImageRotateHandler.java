@@ -1,11 +1,9 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
-import com.backend.domain.chat.util.PositionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,11 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ImageRotateHandler implements MessageHandler {
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
-		Map<String, ObjectNode> resultMap = PositionUtils.extractRotateData(payload, "sticker_id");
+	public JsonNode handle(Map<String, JsonNode> payload) {
+		String stickerId = payload.get("sticker_id").asText();
+		JsonNode stickerData = payload.get("position");
+		String rotate = stickerData.get("rotate2").asText();
 
-		String stickerId = resultMap.keySet().iterator().next();
-		ObjectNode positionNode = resultMap.get(stickerId);
+		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
+		positionNode.put("rotate2", rotate);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
 		response.put("type", "image_rotate");
@@ -29,6 +29,6 @@ public class ImageRotateHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

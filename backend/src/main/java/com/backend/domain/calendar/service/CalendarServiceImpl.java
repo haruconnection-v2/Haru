@@ -34,33 +34,31 @@ public class CalendarServiceImpl implements CalendarService {
 
 	@Override
 	public CalendarResponse getCalendarData(String monthYear, HttpServletRequest request) {
-		request.getSession().setAttribute("monthYear", monthYear);
 		Long memberId = (Long)request.getSession().getAttribute("memberId");
 		//findByMemberIdAndMonthYear
 		Calendar calendar = calendarRepository.findByMemberIdAndMonthYear(memberId, monthYear)
 			.orElseThrow(()-> {
 				request.getSession().setAttribute("calendarId", null);
+				request.getSession().setAttribute("monthYear", monthYear);
 				return new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND);
 			});
 		List<DiaryForCalendarDisplayDto> diaryForCalendarDisplayDtos = diaryRepository.findAllByCalendarId(calendar.getId());
 		List<CalendarStickerResDto> stickers = toCalendarResDto(calendar.getCalendarSticker());
 		request.getSession().setAttribute("calendarId", calendar.getId());
+		request.getSession().setAttribute("monthYear", monthYear);
 		return toCalendarResponse(diaryForCalendarDisplayDtos, stickers);
 	}
 
 	@Override
 	@Transactional
 	public void updateCalendarSticker(CalendarStickerRequest calendarStickerRequest, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Long calendarId = (Long)session.getAttribute("calendarId");
+		Long calendarId = (Long)request.getSession().getAttribute("calendarId");
 		Calendar calendar;
 		if (calendarId == null) {
 			String monthYear = request.getSession().getAttribute("monthYear").toString();
-			calendar = createCalendar(request.getSession(), monthYear);
-			session.setAttribute("calendarId", calendar.getId());
+			calendar = createAndStoreCalendar(request.getSession(), monthYear);
 		} else {
-			calendar = calendarRepository.findById(calendarId)
-				.orElseThrow(() -> new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND));
+			calendar = calendarRepository.findById(calendarId).orElseThrow(() -> new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND));
 		}
 		calendar.getCalendarSticker().add(toCalendarSticker(calendarStickerRequest, calendar));
 		calendarRepository.save(calendar);
@@ -68,18 +66,15 @@ public class CalendarServiceImpl implements CalendarService {
 
 	@Override
 	@Transactional
-	public Calendar getOrCreateCalendar(HttpSession session) {
-		Long memberId = (Long)session.getAttribute("memberId");
-		String monthYear = session.getAttribute("monthYear").toString();
-		Calendar calendar = calendarRepository.findByMemberIdAndMonthYear(memberId, monthYear)
-			.orElseGet(() -> createCalendar(session, monthYear));
-		session.setAttribute("calendarId", calendar.getId());
-		return calendar;
+	public Calendar createAndSessionStoreCalendar(HttpSession session, String monthYear) {
+		return createAndStoreCalendar(session, monthYear);
 	}
 
-	private Calendar createCalendar(HttpSession session, String monthYear) {
+	private Calendar createAndStoreCalendar(HttpSession session, String monthYear) {
 		Long memberId = (Long)session.getAttribute("memberId");
 		Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-		return calendarRepository.save(Calendar.builder().monthYear(monthYear).member(member).build());
+		Calendar calendar = calendarRepository.save(Calendar.builder().monthYear(monthYear).member(member).build());
+		session.setAttribute("calendarId", calendar.getId());
+		return calendar;
 	}
 }

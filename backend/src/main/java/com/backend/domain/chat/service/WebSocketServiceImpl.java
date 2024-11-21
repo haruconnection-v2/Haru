@@ -2,7 +2,6 @@ package com.backend.domain.chat.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
 
@@ -76,6 +75,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 		handlerMap.put("dalle_drag", dalleDragHandler);
 		handlerMap.put("dalle_resize", dalleResizeHandler);
 		handlerMap.put("dalle_rotate", dalleRotateHandler);
+		handlerMap.put("save_dalle", dalleRotateHandler);
 		handlerMap.put("save_dalle", saveDalleHandler);
 		handlerMap.put("delete_object", deleteObjectHandler);
 		handlerMap.put("drag_stop", stopObjectHandler);
@@ -88,7 +88,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 	}
 
 	@Override
-	public CompletableFuture<JsonNode> registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
+	public JsonNode registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
 		MessageHandler handler = handlerMap.get(type);
 
 		//TODO need refactor

@@ -18,8 +18,8 @@ public class CalendarSticker extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String stickerImageUrl;
-	private int topPos;
+	private String stickerImgUrl;
+	private int top;
 	private int leftPos;
 	private int width;
 	private int height;
@@ -32,9 +32,9 @@ public class CalendarSticker extends BaseEntity {
 	}
 
 	@Builder
-	public CalendarSticker(String stickerImageUrl, int topPos, int leftPos, int width, int height, int rotate, Calendar calendar) {
-		this.stickerImageUrl = stickerImageUrl;
-		this.topPos = topPos;
+	public CalendarSticker(String stickerImgUrl, int top, int leftPos, int width, int height, int rotate, Calendar calendar) {
+		this.stickerImgUrl = stickerImgUrl;
+		this.top = top;
 		this.leftPos = leftPos;
 		this.width = width;
 		this.height = height;

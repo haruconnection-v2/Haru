@@ -26,11 +26,10 @@ function ProfileMenu({
       cancelButtonText: '취소',
     }).then(async (result) => {
       if (result.isConfirmed) {
-          const response = await baseInstance.get('/members/logout', {});
+        try {
+          const response = await baseInstance.post('/members/logout/', {});
           // 여기서 로그아웃 성공 여부 확인
-          console.log(response.status);
-          if (response.data.code === 'M100' && response.status === 200
-          || response.data.code === 'M202' && response.status === 202) {
+          if (response.data.code === 'A002' && response.status === 200) {
             Swal.fire({
               title: '로그아웃되었습니다!',
               text: '로그아웃이 성공적으로 처리되었습니다.',
@@ -39,23 +38,28 @@ function ProfileMenu({
               userInfoStore.removeUserInfo(
                 localStorage.getItem('loggedInUserId'),
               );
-              console.log(localStorage.getItem('loggedInUserId'));
               localStorage.removeItem('loggedInUserId');
-              console.log(localStorage.getItem('loggedInUserId'));
               navigate('/'); // 여기서 네비게이션 호출
               deleteCookie('sessionId'); // 쿠키 삭제 함수 호출
             });
-          }
-          // API 호출 중 오류 처리
-          else {
-            console.error('API 호출 중 오류 발생:', error);
+          } else {
+            // 로그아웃 실패 시 처리
             Swal.fire({
               title: '로그아웃 실패',
               text: '로그아웃 중에 문제가 발생했습니다.',
               icon: 'error',
             });
           }
+        } catch (error) {
+          // API 호출 중 오류 처리
+          console.error('API 호출 중 오류 발생:', error);
+          Swal.fire({
+            title: '로그아웃 실패',
+            text: '로그아웃 중에 문제가 발생했습니다.',
+            icon: 'error',
+          });
         }
+      }
     });
   };
   return (

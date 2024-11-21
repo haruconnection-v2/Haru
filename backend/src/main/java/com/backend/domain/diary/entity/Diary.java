@@ -65,8 +65,4 @@ public class Diary extends BaseEntity {
 		}
 		this.isExpiry = true;
 	}
-
-	public void updateDiaryLink(String snsLink) {
-		this.snsLink = snsLink;
-	}
 }

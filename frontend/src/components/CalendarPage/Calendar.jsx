@@ -28,7 +28,6 @@ import CalendarLeftBtn from '../../assets/img/CalendarLeftBtn.png';
 import DiaryViewIcon from '../../assets/img/Calendar/DiaryViewIcon.png';
 import DiaryWriteIcon from '../../assets/img/Calendar/DiaryWriteIcon.png';
 import DiaryEditIcon from '../../assets/img/Calendar/DiaryEditIcon.png';
-import calendarStickers from "../../components/CalendarPage/CalendarStickers";
 // import useDiaryIdStore from './../../stores/diaryIdStore';
 
 const Calendar = ({ selectedSticker, setSelectedSticker }) => {
@@ -85,41 +84,36 @@ const Calendar = ({ selectedSticker, setSelectedSticker }) => {
     const fetchData = async () => {
       const yearMonth = format(currentMonth, 'yyyy-MM');
       try {
-        const response = await baseInstance.get(`/calendars/?monthYear=${yearMonth}`, {});
-        if (response.data.data.calendarStickers) {
-          const extractedStickerInfo = response.data.data.calendarStickers.map(
+        const response = await baseInstance.get(
+          `/calendars/?year_month=${yearMonth}`,
+        );
+        if (response.data) {
+          const extractedStickerInfo = response.data.sticker_image_url.map(
             (sticker) => [
-              sticker.stickerImageUrl,
-              sticker.topPos,
-              sticker.leftPos,
+              sticker.sticker_image_url,
+              sticker.top,
+              sticker.left,
               sticker.width,
               sticker.height,
               sticker.rotate,
             ],
           );
-          console.log('Extracted Sticker Info:', extractedStickerInfo);
-          setStickerInfoArr(extractedStickerInfo);
-        } else {
-          console.log('스티커 정보 없음');
-          setStickerInfoArr([]);
-        }
-        if (response.data.data.diaries) {
+
           setDiaryInfoArray(
-            response.data.data.diaries.map((diary) => ({
+            response.data.diaries.map((diary) => ({
               day: diary.day,
-              isExpiry: diary.isExpiry,
+              isExpiry: diary.is_expiry,
             })),
           );
-        } else {
-          console.log('일기 정보 없음');
-          setDiaryInfoArray([]);
+          console.log('Extracted Sticker Info:', extractedStickerInfo);
+          setStickerInfoArr(extractedStickerInfo);
         }
-      }
-      catch (error) {
+      } catch (error) {
         setDiaryInfoArray([]);
         console.log(`${yearMonth} 달력 조회 실패`);
       }
     };
+
     fetchData();
   }, [currentMonth, iconUpdate]);
 
@@ -188,7 +182,7 @@ const Calendar = ({ selectedSticker, setSelectedSticker }) => {
           if (response.status === 200) {
             console.log('일기장 확인 성공!');
 
-            handleMakeURL(response.data.data.diaryId);
+            handleMakeURL(response.data.diary_id);
 
             setPage(3);
             console.log(
@@ -210,7 +204,7 @@ const Calendar = ({ selectedSticker, setSelectedSticker }) => {
           });
 
           if (response.status === 200) {
-            setDiaryId(response.data.data.diaryId);
+            setDiaryId(response.data.diary_id);
             console.log('diary_id: ', diaryId);
             navigate('../past');
           } else {

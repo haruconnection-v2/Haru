@@ -9,10 +9,10 @@ function OpenDiary({ diaryId }) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await baseInstance.get(
+        const response = await baseInstance.post(
             `/diaries/${diaryId}`,
             {
-              diaryId: diaryId,
+              diary_id: diaryId,
             }
           );
           if (response.data.code === 'D001' && response.status === 200) {
@@ -39,7 +39,7 @@ function OpenDiary({ diaryId }) {
     }
 
     return diaryData.diaryTextBoxs.map((textbox) => (
-      <div key={textbox.textboxId}>
+      <div key={textbox.textbox_id}>
         <p>{textbox.content}</p>
       </div>
     ));
@@ -51,8 +51,8 @@ function OpenDiary({ diaryId }) {
     }
 
     return diaryData.diaryStickers.map((sticker) => (
-      <div key={sticker.stickerId}>
-        <img src={sticker.stickerImageUrl} alt="스티커 이미지" />
+      <div key={sticker.sticker_id}>
+        <img src={sticker.sticker_image_url} alt="스티커 이미지" />
       </div>
     ));
   };
@@ -65,7 +65,7 @@ function OpenDiary({ diaryId }) {
       {diaryData && (
         <div>
           <h2>{diaryData.diary_date}</h2>
-          <img src={diaryData.diaryBgUrl} alt="일기 배경 이미지" />
+          <img src={diaryData.diary_bg_url} alt="일기 배경 이미지" />
           {renderTextboxes()}
           {renderStickers()}
         </div>

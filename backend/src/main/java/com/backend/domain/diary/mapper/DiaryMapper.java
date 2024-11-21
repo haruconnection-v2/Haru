@@ -40,7 +40,7 @@ public class DiaryMapper {
 
 	private static DiaryTextBoxResDto toDiaryTextBoxResDto(DiaryTextBox diaryTextBox) {
 		return DiaryTextBoxResDto.builder()
-			.textboxId(diaryTextBox.getId())
+			.id(diaryTextBox.getId())
 			.writer(diaryTextBox.getWriter())
 			.content(diaryTextBox.getContent())
 			.xcoor(diaryTextBox.getXcoor())
@@ -57,8 +57,8 @@ public class DiaryMapper {
 
 	private static DiaryStickerResDto toDiaryStickerResDto(DiarySticker sticker) {
 		return DiaryStickerResDto.builder()
-			.stickerId(sticker.getId())
-			.stickerImageUrl(sticker.getStickerImageUrl())
+			.id(sticker.getId())
+			.stickerImgUrl(sticker.getStickerImgUrl())
 			.top(sticker.getTop())
 			.leftPos(sticker.getLeftPos())
 			.width(sticker.getWidth())
@@ -89,10 +89,10 @@ public class DiaryMapper {
 	public static Diary updateDiaryTextAndImageBoxes(Diary diary, DiaryRequest diaryRequest) {
 		diary.getDiaryStickers().clear();
 		diary.getDiaryTextBoxes().clear();
-		List<DiarySticker> stickers = diaryRequest.getDiaryStickers().stream()
+		List<DiarySticker> stickers = diaryRequest.getStickers().stream()
 			.map(sticker -> DiaryMapper.toDiarySticker(sticker, diary)).toList();
 		diary.getDiaryStickers().addAll(stickers);
-		List<DiaryTextBox> textBoxes = diaryRequest.getDiaryTextBoxes().stream()
+		List<DiaryTextBox> textBoxes = diaryRequest.getTextBoxes().stream()
 			.map(textBox -> DiaryMapper.toDiaryTextBox(textBox, diary)).toList();
 		diary.getDiaryTextBoxes().addAll(textBoxes);
 		return diary;
@@ -100,7 +100,7 @@ public class DiaryMapper {
 
 	private static DiarySticker toDiarySticker(DiaryStickerReqDto sticker, Diary diary) {
 		return DiarySticker.builder()
-			.stickerImageUrl(sticker.getStickerImageUrl())
+			.stickerImgUrl(sticker.getStickerImgUrl())
 			.top(sticker.getTop())
 			.leftPos(sticker.getLeftPos())
 			.height(sticker.getHeight())

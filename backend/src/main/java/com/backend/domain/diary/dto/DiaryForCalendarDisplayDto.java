@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public class DiaryForCalendarDisplayDto {
 	private final String day;
-	private final Boolean isExpiry;
+	private final boolean isExpiry;
 
-	public DiaryForCalendarDisplayDto(String day, Boolean isExpiry) {
+	public DiaryForCalendarDisplayDto(String day, boolean isExpiry) {
 		this.day = day;
 		this.isExpiry = isExpiry;
 	}

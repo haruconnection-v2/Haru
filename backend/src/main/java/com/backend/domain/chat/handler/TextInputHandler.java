@@ -1,7 +1,6 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TextInputHandler implements MessageHandler {
 
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 		String textId = payload.get("id").asText();
 		String content = payload.get("content").asText();
 
@@ -27,6 +26,6 @@ public class TextInputHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }
