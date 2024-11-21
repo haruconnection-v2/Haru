@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'BASE_URL', // 개발용 - 이 밑의 주석 다 해제하기
+        target: 'http://34.203.203.123:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
