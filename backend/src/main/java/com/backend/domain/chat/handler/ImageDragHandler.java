@@ -1,9 +1,11 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.util.PositionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,15 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ImageDragHandler implements MessageHandler {
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
-		String stickerId = payload.get("stickerId").asText();
-		JsonNode stickerData = payload.get("sticker_id");
-		String top = stickerData.get("top2").asText();
-		String left = stickerData.get("left2").asText();
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+		Map<String, ObjectNode> resultMap = PositionUtils.extractTopAndLeftData(payload, "stickerId");
 
-		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("top2", top);
-		positionNode.put("left2", left);
+		String stickerId = resultMap.keySet().iterator().next();
+		ObjectNode positionNode = resultMap.get(stickerId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
 		response.put("type", "image_drag");
@@ -31,6 +29,6 @@ public class ImageDragHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

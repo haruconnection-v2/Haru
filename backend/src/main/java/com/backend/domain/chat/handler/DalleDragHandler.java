@@ -1,9 +1,11 @@
 package com.backend.domain.chat.handler;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.util.PositionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,15 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DalleDragHandler implements MessageHandler {
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
-		String dalleId = payload.get("dalle_id").asText();
-		JsonNode dalleData = payload.get("position");
-		String top = dalleData.get("top2").asText();
-		String left = dalleData.get("left2").asText();
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
-		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("top2", top);
-		positionNode.put("left2", left);
+		Map<String, ObjectNode> resultMap = PositionUtils.extractTopAndLeftData(payload, "dalle_id");
+
+		String dalleId = resultMap.keySet().iterator().next();
+		ObjectNode positionNode = resultMap.get(dalleId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
 		response.put("type", "dalle_drag");
@@ -31,6 +30,6 @@ public class DalleDragHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

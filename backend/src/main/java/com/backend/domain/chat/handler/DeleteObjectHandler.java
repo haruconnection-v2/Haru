@@ -3,13 +3,19 @@ package com.backend.domain.chat.handler;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.chat.util.DiaryStickerUtils;
+import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,9 +30,12 @@ public class DeleteObjectHandler implements MessageHandler {
 
 	private final DiaryStickerRepository diaryStickerRepository;
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
+	private final DiaryStickerUtils diaryStickerUtils;
+	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
 		String objectType = payload.get("object_type").asText();
 		String objectId = payload.get("object_id").asText();
@@ -39,20 +48,19 @@ public class DeleteObjectHandler implements MessageHandler {
 		log.info("Response created: {}", response);
 
 		if (Objects.equals(objectType, "sticker") || Objects.equals(objectType, "dalle")) {
-			Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(objectId));
-			//TODO Exception
-			DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+
+			DiarySticker diarySticker = diaryStickerUtils.fetchDiarySticker(objectId);
 			diarySticker.changeToDelete();
 			diaryStickerRepository.save(diarySticker);
 
 		} else if (Objects.equals(objectType, "textbox")) {
-			Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.valueOf(objectId));
-			//TODO Exception
-			DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+
+			DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(objectId);
+
 			diaryTextBox.changeToDelete();
 			diaryTextBoxRepository.save(diaryTextBox);
 		}
 
-		return response;
+		return CompletableFuture.completedFuture(response);
 	}
 }

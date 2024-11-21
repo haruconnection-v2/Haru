@@ -70,26 +70,26 @@ function SignUpPage(props) {
   };
   const handlePasswordChange = (e) => {
     const inputPw = e.target.value;
-    const hasValidLength = inputPw.length >= 8 && inputPw.length <= 16;
-    const hasLetter = /[a-zA-Z]/.test(inputPw);
-    const hasNumber = /\d/.test(inputPw);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
-      inputPw,
-    );
+  //   const hasValidLength = inputPw.length >= 8 && inputPw.length <= 16;
+  //   const hasLetter = /[a-zA-Z]/.test(inputPw);
+  //   const hasNumber = /\d/.test(inputPw);
+  //   const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+  //     inputPw,
+  //   );
     setPassword(e.target.value);
-    if (hasValidLength && hasLetter && hasNumber && hasSpecialChar) {
-      setPwComment(' - 사용 가능한 비밀번호입니다.');
-      setPwCommentColor('#00A656');
-      setPwWrite(true);
-      setPasswordCheck(inputPw);
-    } else {
-      setPwComment(
-        ' - 비밀번호는 8~16자여야 하며, 영문자, 숫자, 특수문자를 반드시 포함해야 합니다.',
-      );
-      setPwCommentColor('#DD0000');
-      setPwWrite(false);
-      setPasswordCheck(inputPw);
-    }
+  //   if (hasValidLength && hasLetter && hasNumber && hasSpecialChar) {
+  //     setPwComment(' - 사용 가능한 비밀번호입니다.');
+    setPwCommentColor('#00A656');
+    setPwWrite(true);
+    setPasswordCheck(inputPw);
+  //   } else {
+  //     setPwComment(
+  //       ' - 비밀번호는 8~16자여야 하며, 영문자, 숫자, 특수문자를 반드시 포함해야 합니다.',
+  //     );
+  //     setPwCommentColor('#DD0000');
+  //     setPwWrite(false);
+  //     setPasswordCheck(inputPw);
+  //   }
   };
   const handlePasswordMatchChange = (e) => {
     const inputPwMatch = e.target.value;
@@ -112,8 +112,8 @@ function SignUpPage(props) {
   //api
   const handleSignUp = async () => {
     try {
-      const response = await baseInstance.post('/members/signup/', {
-        login_id: id,
+      const response = await baseInstance.post('/members/signup', {
+        loginId: id,
         nickname: username,
         password: password,
       });

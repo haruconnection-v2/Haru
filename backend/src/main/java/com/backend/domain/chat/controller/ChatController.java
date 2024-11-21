@@ -1,5 +1,7 @@
 package com.backend.domain.chat.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -31,13 +33,19 @@ public class ChatController {
 
 		WebSocketMessageReq webSocketMessage = objectMapper.readValue(payload, WebSocketMessageReq.class);
 
-		JsonNode response = webSocketService.registerHandler(roomId, webSocketMessage.getType(), webSocketMessage.getPayload());
+		CompletableFuture<JsonNode> response = webSocketService.registerHandler(roomId, webSocketMessage.getType(), webSocketMessage.getPayload());
 
 		if (response == null) {
 			throw new IllegalArgumentException("Handler did not return any response");
 		}
 
-		// 구독하고 있는 장소로 메시지 전송 (방 ID를 포함하여 전송)
-		messagingTemplate.convertAndSend("/harurooms/" + roomId, response);
+		// 비동기 작업이 완료된 후 메시지를 전송
+		response.thenAccept(res -> {
+			messagingTemplate.convertAndSend("/harurooms/" + roomId, res);
+			log.info("Message sent to room {}: {}", roomId, res);
+		}).exceptionally(ex -> {
+			log.error("Failed to process message for room {}: {}", roomId, ex.getMessage());
+			return null;
+		});
 	}
 }

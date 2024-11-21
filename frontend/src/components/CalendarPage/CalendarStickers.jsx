@@ -22,8 +22,8 @@ function Stickers({ onDelete, image, parentRef }) {
     const stickerData = {
       stickers_info: {
         sticker_image_url: image,
-        top: position.top2,
-        left: position.left2,
+        topPos: position.top2,
+        leftPos: position.left2,
         width: position.width2,
         height: position.height2,
         rotate: position.rotate2,

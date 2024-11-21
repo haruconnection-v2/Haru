@@ -24,8 +24,8 @@ public class CalendarMapper {
 
 	public static CalendarSticker toCalendarSticker(CalendarStickerRequest calendarStickerRequest, Calendar calendar) {
 		return CalendarSticker.builder()
-			.stickerImgUrl(calendarStickerRequest.getStickerImgUrl())
-			.top(calendarStickerRequest.getTop())
+			.stickerImageUrl(calendarStickerRequest.getStickerImageUrl())
+			.topPos(calendarStickerRequest.getTopPos())
 			.leftPos(calendarStickerRequest.getLeftPos())
 			.width(calendarStickerRequest.getWidth())
 			.height(calendarStickerRequest.getHeight())
@@ -43,8 +43,8 @@ public class CalendarMapper {
 	private static CalendarStickerResDto toCalendarStickerResDto(CalendarSticker calendarSticker) {
 		return CalendarStickerResDto.builder()
 			.id(calendarSticker.getId())
-			.stickerImgUrl(calendarSticker.getStickerImgUrl())
-			.top(calendarSticker.getTop())
+			.stickerImageUrl(calendarSticker.getStickerImageUrl())
+			.topPos(calendarSticker.getTopPos())
 			.leftPos(calendarSticker.getLeftPos())
 			.width(calendarSticker.getWidth())
 			.height(calendarSticker.getHeight())

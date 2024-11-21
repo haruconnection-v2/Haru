@@ -23,14 +23,14 @@ import lombok.RequiredArgsConstructor;
 public class CalendarController {
 
 	private final CalendarService calendarService;
-	@GetMapping("/calendar")
+	@GetMapping("/calendars/")
 	public ResponseEntity<ResultResponse<CalendarResponse>> getCalendar(@RequestParam String monthYear, HttpServletRequest request) {
 		CalendarResponse calendarResponse = calendarService.getCalendarData(monthYear, request);
 		ResultResponse<CalendarResponse> resultResponse = ResultResponse.of(ResultCode.FIND_CALENDAR_SUCCESS, calendarResponse);
 		return ResponseEntity.status(ResultCode.FIND_CALENDAR_SUCCESS.getHttpStatus()).body(resultResponse);
 	}
 
-	@PostMapping("/calendar/sticker")
+	@PostMapping("/calendars/sticker")
 	public ResponseEntity<ResultResponse<Void>> updateCalendarSticker(@RequestBody CalendarStickerRequest calendarStickerRequest,
 																	  HttpServletRequest request) {
 		calendarService.updateCalendarSticker(calendarStickerRequest, request);

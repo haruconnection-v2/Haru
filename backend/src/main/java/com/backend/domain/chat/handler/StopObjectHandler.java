@@ -3,15 +3,21 @@ package com.backend.domain.chat.handler;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.backend.domain.chat.dto.request.UpdateDiaryStickerReq;
 import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
+import com.backend.domain.chat.util.DiaryStickerUtils;
+import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
@@ -24,9 +30,12 @@ public class StopObjectHandler implements MessageHandler {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final DiaryStickerRepository diaryStickerRepository;
+	private final DiaryStickerUtils diaryStickerUtils;
+	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
+	@Async
 	@Override
-	public JsonNode handle(Map<String, JsonNode> payload) {
+	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 		String objectType = payload.get("object_type").asText();
 		// 중복 코드 메서드화 하기
 		if (Objects.equals(objectType, "sticker")) {
@@ -39,9 +48,7 @@ public class StopObjectHandler implements MessageHandler {
 			String left = stickerData.get("left2").asText();
 			String rotate = stickerData.get("rotate2").asText();
 
-			Optional<DiarySticker> diaryStickerOptional = diaryStickerRepository.findById(Long.valueOf(stickerId));
-			// TODO Exception
-			DiarySticker diarySticker = diaryStickerOptional.orElseThrow();
+			DiarySticker diarySticker = diaryStickerUtils.fetchDiarySticker(stickerId);
 
 			UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
 				.top(Integer.parseInt(top))
@@ -64,9 +71,7 @@ public class StopObjectHandler implements MessageHandler {
 			String width = textData.get("width").asText();
 			String height = textData.get("height").asText();
 
-			Optional<DiaryTextBox> diaryTextBoxOptional = diaryTextBoxRepository.findById(Long.parseLong(textId));
-			// TODO Exception
-			DiaryTextBox diaryTextBox = diaryTextBoxOptional.orElseThrow();
+			DiaryTextBox diaryTextBox = diaryTextBoxUtils.fetchDiaryTextBox(textId);
 
 			UpdateDiaryTextBoxReq req = UpdateDiaryTextBoxReq.builder()
 				.content(content)
@@ -81,6 +86,6 @@ public class StopObjectHandler implements MessageHandler {
 
 		}
 
-		return null;
+		return CompletableFuture.completedFuture(null);
 	}
 }

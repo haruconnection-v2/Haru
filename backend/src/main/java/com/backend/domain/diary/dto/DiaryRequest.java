@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @Getter
 public class DiaryRequest {
-	private final List<DiaryStickerReqDto> stickers;
-	private final List<DiaryTextBoxReqDto> textBoxes;
+	private final List<DiaryStickerReqDto> diaryStickers;
+	private final List<DiaryTextBoxReqDto> diaryTextBoxes;
 	@Builder
-	public DiaryRequest(List<DiaryStickerReqDto> stickers, List<DiaryTextBoxReqDto> textBoxes) {
-		this.stickers = stickers;
-		this.textBoxes = textBoxes;
+	public DiaryRequest(List<DiaryStickerReqDto> diaryStickers, List<DiaryTextBoxReqDto> diaryTextBoxes) {
+		this.diaryStickers = diaryStickers;
+		this.diaryTextBoxes = diaryTextBoxes;
 	}
 }
