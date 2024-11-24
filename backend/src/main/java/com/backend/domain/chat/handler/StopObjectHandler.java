@@ -35,7 +35,7 @@ public class StopObjectHandler implements MessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 		String objectType = payload.get("object_type").asText();
 		// 중복 코드 메서드화 하기
 		if (Objects.equals(objectType, "sticker")) {
@@ -86,6 +86,6 @@ public class StopObjectHandler implements MessageHandler {
 
 		}
 
-		return CompletableFuture.completedFuture(null);
+		return null;
 	}
 }

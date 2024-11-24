@@ -31,7 +31,7 @@ public class SaveStickerHandler implements MessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 
 		Map<String, Object> resultMap = PositionUtils.extractPositionData(payload, "id");
 		String stickerId = (String) resultMap.get("id");
@@ -59,6 +59,6 @@ public class SaveStickerHandler implements MessageHandler {
 		diarySticker.updateDiarySticker(req);
 		diaryStickerRepository.save(diarySticker);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

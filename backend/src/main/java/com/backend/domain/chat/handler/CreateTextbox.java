@@ -34,7 +34,7 @@ public class CreateTextbox implements RoomMessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
+	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
 
 		ObjectNode positionNode = PositionUtils.extractPositionData(payload);
 
@@ -58,6 +58,6 @@ public class CreateTextbox implements RoomMessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

@@ -88,7 +88,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 	}
 
 	@Override
-	public CompletableFuture<JsonNode> registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
+	public JsonNode registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
 		MessageHandler handler = handlerMap.get(type);
 
 		//TODO need refactor

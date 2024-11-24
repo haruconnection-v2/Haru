@@ -92,7 +92,7 @@ function DiaryPage() {
       return;
     }
 
-    const url = `ws://52.90.5.225:8080/ws`;
+    const url = `ws://localhost:8080/ws`;
     const client = Stomp.client(url);
     stompClient.current = client;
 

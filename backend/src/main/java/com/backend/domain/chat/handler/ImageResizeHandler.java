@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageResizeHandler implements MessageHandler {
 
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 		Map<String, ObjectNode> resultMap = PositionUtils.extractPositionDataWithoutRotate(payload, "sticker_id");
 
 		String stickerId = resultMap.keySet().iterator().next();
@@ -30,6 +30,6 @@ public class ImageResizeHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

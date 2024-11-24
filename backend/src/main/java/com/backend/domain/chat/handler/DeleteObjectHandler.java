@@ -35,7 +35,7 @@ public class DeleteObjectHandler implements MessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 
 		String objectType = payload.get("object_type").asText();
 		String objectId = payload.get("object_id").asText();
@@ -61,6 +61,6 @@ public class DeleteObjectHandler implements MessageHandler {
 			diaryTextBoxRepository.save(diaryTextBox);
 		}
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

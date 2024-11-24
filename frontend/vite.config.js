@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://52.90.5.225:8080',
+        target: 'BASE_URL', // 로컬 개발용,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ImageDragHandler implements MessageHandler {
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 		Map<String, ObjectNode> resultMap = PositionUtils.extractTopAndLeftData(payload, "stickerId");
 
 		String stickerId = resultMap.keySet().iterator().next();
@@ -29,6 +29,6 @@ public class ImageDragHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

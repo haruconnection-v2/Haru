@@ -32,7 +32,7 @@ public class CreateStickerHandler implements RoomMessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
+	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
 		Map<String, Object> resultMap = PositionUtils.extractPositionData(payload, "sticker_id");
 		String stickerId = (String) resultMap.get("id");
 		String stickerUrl = (String) resultMap.get("url");
@@ -60,6 +60,6 @@ public class CreateStickerHandler implements RoomMessageHandler {
 
 		diaryStickerRepository.save(diarySticker);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

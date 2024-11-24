@@ -32,7 +32,7 @@ public class CreateDalleHandler implements RoomMessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
+	public JsonNode handle(Long roomId, Map<String, JsonNode> payload) {
 
 		Map<String, Object> resultMap = PositionUtils.extractPositionData(payload, "dalle_id");
 		String dalleId = (String) resultMap.get("id");
@@ -61,6 +61,6 @@ public class CreateDalleHandler implements RoomMessageHandler {
 
 		diaryStickerRepository.save(diarySticker);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DalleResizeHandler implements MessageHandler {
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 
 		Map<String, ObjectNode> resultMap = PositionUtils.extractPositionDataWithoutRotate(payload, "dalle_id");
 
@@ -30,6 +30,6 @@ public class DalleResizeHandler implements MessageHandler {
 
 		log.info("Response created: {}", response);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }

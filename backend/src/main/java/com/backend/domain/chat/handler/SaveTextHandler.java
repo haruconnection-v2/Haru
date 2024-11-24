@@ -30,7 +30,7 @@ public class SaveTextHandler implements MessageHandler {
 
 	@Async
 	@Override
-	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+	public JsonNode handle(Map<String, JsonNode> payload) {
 
 		String textId = payload.get("id").asText();
 		String content = payload.get("content").asText();
@@ -69,6 +69,6 @@ public class SaveTextHandler implements MessageHandler {
 		diaryTextBox.updateDiaryTextBox(req);
 		diaryTextBoxRepository.save(diaryTextBox);
 
-		return CompletableFuture.completedFuture(response);
+		return response;
 	}
 }
