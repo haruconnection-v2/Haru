@@ -19,14 +19,14 @@ const RightSticker = ({ onDalleSelect, websocket }) => {
     onDalleSelect(image);
     websocket.current.send(
       JSON.stringify({
-        type: 'create_dalle',
+        type: 'createDalle',
         image: image,
         position: {
-          top2: 100,
-          left2: 100,
-          width2: 100,
-          height2: 100,
-          rotate2: 0,
+          topPos: 100,
+          leftPos: 100,
+          width: 100,
+          height: 100,
+          rotate: 0,
         },
       }),
     );
@@ -45,7 +45,7 @@ const RightSticker = ({ onDalleSelect, websocket }) => {
             content: diaryContent,
           }); //1번
           const data = response.data.data;
-          setStickerImages(data.sticker_image_urls); //1번
+          setStickerImages(data.stickerImageUrls); //1번
 
           // const response = await baseInstance.get(`/static/stickers?page=1`); //2번
           // const data = response.data.data;

@@ -11,8 +11,6 @@ import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
 import com.backend.domain.chat.util.DiaryTextBoxUtils;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
-import com.backend.global.common.exception.NotFoundException;
-import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,7 +30,7 @@ public class SaveTextHandler implements MessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
-		String textId = payload.get("id").asText();
+		String textId = payload.get("textId").asText();
 		String content = payload.get("content").asText();
 		String nickname = payload.get("nickname").asText();
 		JsonNode textData = payload.get("position");
@@ -48,8 +46,8 @@ public class SaveTextHandler implements MessageHandler {
 		positionNode.put("height", height);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "save_text");
-		response.put("text_id", textId);
+		response.put("type", "saveText");
+		response.put("textId", textId);
 		response.put("content", content);
 		response.put("nickname", nickname);
 		response.set("position", positionNode);

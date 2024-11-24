@@ -13,7 +13,7 @@ function SaveButton({ savedData }) {
     console.log('저장할 데이터:', savedData);
     try {
       const response = await baseInstance.put('/diaries/save', {
-        saved_data: savedData,
+        savedData: savedData,
       });
       if (response.status === 200) {
         console.log('일기 저장 성공');

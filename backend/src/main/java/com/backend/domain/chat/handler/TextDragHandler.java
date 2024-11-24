@@ -18,14 +18,16 @@ public class TextDragHandler implements MessageHandler {
 
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
+		log.info("chatController payload: {}", payload);
+
 		Map<String, ObjectNode> resultMap = PositionUtils.extractTopAndLeftData(payload);
 
 		String textId = resultMap.keySet().iterator().next();
 		ObjectNode positionNode = resultMap.get(textId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "text_drag");
-		response.put("text_id", textId);
+		response.put("type", "textDrag");
+		response.put("textId", textId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);

@@ -18,14 +18,14 @@ public class DalleResizeHandler implements MessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
-		Map<String, ObjectNode> resultMap = PositionUtils.extractPositionDataWithoutRotate(payload, "dalle_id");
+		Map<String, ObjectNode> resultMap = PositionUtils.extractPositionDataWithoutRotate(payload, "dalleId");
 
 		String dalleId = resultMap.keySet().iterator().next();
 		ObjectNode positionNode = resultMap.get(dalleId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "dalle_resize");
-		response.put("dalle_id", dalleId);
+		response.put("type", "dalleResize");
+		response.put("dalleId", dalleId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);

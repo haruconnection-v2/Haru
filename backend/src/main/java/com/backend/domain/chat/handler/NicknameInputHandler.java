@@ -21,8 +21,8 @@ public class NicknameInputHandler implements MessageHandler {
 		String nickname = payload.get("nickname").asText();
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "nickname_input");
-		response.put("text_id", textId);
+		response.put("type", "nicknameInput");
+		response.put("textId", textId);
 		response.put("nickname", nickname);
 
 		log.info("Response created: {}", response);

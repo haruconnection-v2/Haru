@@ -17,12 +17,12 @@ public class TextInputHandler implements MessageHandler {
 
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
-		String textId = payload.get("id").asText();
+		String textId = payload.get("textId").asText();
 		String content = payload.get("content").asText();
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "text_input");
-		response.put("text_id", textId);
+		response.put("type", "textInput");
+		response.put("textId", textId);
 		response.put("content", content);
 
 		log.info("Response created: {}", response);

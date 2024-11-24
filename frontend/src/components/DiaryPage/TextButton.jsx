@@ -12,7 +12,7 @@ function TextButton({ onClick, websocket, diaryId }) {
     websocket.current.publish({
       destination: `/send/${diaryId}`,
       body: JSON.stringify({
-        type: 'create_textbox',
+        type: 'createTextbox',
         position: {
           width: 300,
           height: 100,

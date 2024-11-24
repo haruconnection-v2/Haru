@@ -2,7 +2,6 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
@@ -14,8 +13,6 @@ import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
-import com.backend.global.common.exception.NotFoundException;
-import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,13 +34,13 @@ public class DeleteObjectHandler implements MessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
-		String objectType = payload.get("object_type").asText();
-		String objectId = payload.get("object_id").asText();
+		String objectType = payload.get("objectType").asText();
+		String objectId = payload.get("objectId").asText();
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "delete_object");
-		response.put("object_type", objectType);
-		response.put("object_id", objectId);
+		response.put("type", "deleteObject");
+		response.put("objectType", objectType);
+		response.put("objectId", objectId);
 
 		log.info("Response created: {}", response);
 
