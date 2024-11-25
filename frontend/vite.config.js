@@ -7,11 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'BASE_URL', // 로컬 개발용
+        target: 'http://44.215.101.154:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
 });
-//target: 'http://44.215.101.154:8080', //배포용
