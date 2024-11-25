@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # root 비밀번호 설정
+      MYSQL_DATABASE: ${MYSQL_DATABASE}            # 기본 데이터베이스 생성
+      MYSQL_USER: ${MYSQL_USER}                    # 일반 사용자 생성
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    networks:
+      - haru-network
+    volumes:
+      - mysql-data:/var/lib/mysql  # 데이터 볼륨 추가
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - haru-network
+    command: [ "java", "-jar", "/app.jar" ]
+
+
+  frontend: #프론트 엔드 서비스를 만듬
+    build:
+      context: ./frontend #프론트 엔드 소스코드는 이 경로에 있다.
+      dockerfile: ./Dockerfile #빌드할때 프론트엔드 도커파일을 사용함.
+      args:
+        API_URL: "*"
+    container_name: frontend
+    volumes:
+      - ./frontend:/frontend
+      - build_folder:/frontend/dist
+      - ./frontend/node_modules:/frontend/node_modules
+    image: frontend
+    tty: true
+    networks:
+      - haru-network
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - build_folder:/var/www/frontend:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs:/var/log/nginx
+    tty: true
+    depends_on:
+      - frontend
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - haru-network
+
+networks:
+  haru-network:
+    driver: bridge
+
+volumes:
+  build_folder:
+  mysql-data:
