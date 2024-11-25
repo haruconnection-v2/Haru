@@ -21,8 +21,8 @@ public class TextInputHandler implements MessageHandler {
 		String content = payload.get("content").asText();
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "text_input");
-		response.put("text_id", textId);
+		response.put("type", "textInput");
+		response.put("id", textId);
 		response.put("content", content);
 
 		log.info("Response created: {}", response);

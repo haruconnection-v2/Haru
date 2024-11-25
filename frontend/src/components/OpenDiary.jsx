@@ -64,7 +64,7 @@ function OpenDiary({ diaryId }) {
       </button>
       {diaryData && (
         <div>
-          <h2>{diaryData.diary_date}</h2>
+          <h2>{diaryData.diaryDate}</h2>
           <img src={diaryData.diaryBgUrl} alt="일기 배경 이미지" />
           {renderTextboxes()}
           {renderStickers()}

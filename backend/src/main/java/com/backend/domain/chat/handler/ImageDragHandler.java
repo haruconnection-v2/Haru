@@ -23,8 +23,8 @@ public class ImageDragHandler implements MessageHandler {
 		ObjectNode positionNode = resultMap.get(stickerId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "image_drag");
-		response.put("sticker_id", stickerId);
+		response.put("type", "imageDrag");
+		response.put("stickerId", stickerId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);

@@ -34,15 +34,15 @@ function Stickers({ stickerId, image, websocket }) {
         if (result.isConfirmed) {
           websocket.current.send(
             JSON.stringify({
-              type: 'save_sticker',
+              type: 'saveSticker',
               id: stickerId,
               image: image,
               position: {
-                top2: sticker.top2,
-                left2: sticker.left2,
-                width2: sticker.width2,
-                height2: sticker.height2,
-                rotate2: sticker.rotate2,
+                topPos: sticker.top2,
+                leftPos: sticker.left2,
+                width: sticker.width2,
+                height: sticker.height2,
+                rotate: sticker.rotate2,
               },
             }),
           );
@@ -89,7 +89,7 @@ function Stickers({ stickerId, image, websocket }) {
       JSON.stringify({
         type,
         id: stickerId,
-        object_type: objectType,
+        objectType: objectType,
         position: updatedPosition,
       }),
     );
@@ -98,19 +98,19 @@ function Stickers({ stickerId, image, websocket }) {
   // eslint-disable-next-line no-unused-vars
   const handleResize = (style, isShiftKey, type) => {
     const position = {
-      width2: Math.round(style.width),
-      height2: Math.round(style.height),
-      top2: Math.round(style.top),
-      left2: Math.round(style.left),
+      width: Math.round(style.width),
+      height: Math.round(style.height),
+      topPos: Math.round(style.top),
+      leftPos: Math.round(style.left),
     };
 
-    sendWebSocketMessage('image_resize', position);
+    sendWebSocketMessage('imageResize', position);
   };
 
   const handleRotate = (rotateAngle) => {
     console.log('회전');
     const roundedRotate = Math.round(rotateAngle);
-    sendWebSocketMessage('image_rotate', { rotate2: roundedRotate });
+    sendWebSocketMessage('imageRotate', { rotate2: roundedRotate });
   };
 
   const handleDrag = (deltaX, deltaY) => {
@@ -120,61 +120,61 @@ function Stickers({ stickerId, image, websocket }) {
     const roundedTop = Math.round(newTop);
     const roundedLeft = Math.round(newLeft);
 
-    sendWebSocketMessage('image_drag', {
-      top2: roundedTop,
-      left2: roundedLeft,
+    sendWebSocketMessage('imageDrag', {
+      topPos: roundedTop,
+      leftPos: roundedLeft,
     });
   };
 
   const handleDragStop = () => {
-    object_type = 'sticker';
+    const objectType = 'sticker';
     const stickerData = {
       image: image,
-      width2: sticker.width2,
-      height2: sticker.height2,
-      top2: sticker.top2,
-      left2: sticker.left2,
-      rotate2: sticker.rotate2,
+      width: sticker.width2,
+      height: sticker.height2,
+      topPos: sticker.top2,
+      leftPos: sticker.left2,
+      rotate: sticker.rotate2,
     };
     useStickerStore.getState().updateSticker(stickerData);
-    sendWebSocketMessage('drag_stop', object_type, stickerData);
+    sendWebSocketMessage('dragStop', objectType, stickerData);
   };
 
   const handleResizeStop = () => {
-    object_type = 'sticker';
+    const objectType = 'sticker';
     const stickerData = {
       image: image,
-      width2: sticker.width2,
-      height2: sticker.height2,
-      top2: sticker.top2,
-      left2: sticker.left2,
-      rotate2: sticker.rotate2,
+      width: sticker.width2,
+      height: sticker.height2,
+      topPos: sticker.top2,
+      leftPos: sticker.left2,
+      rotate: sticker.rotate2,
     };
     useStickerStore.getState().updateSticker(stickerData);
-    sendWebSocketMessage('resize_stop', object_type, stickerData);
+    sendWebSocketMessage('resizeStop', objectType, stickerData);
   };
 
   const handleRotateStop = () => {
-    object_type = 'sticker';
+    const objectType = 'sticker';
     const stickerData = {
       image: image,
-      width2: sticker.width2,
-      height2: sticker.height2,
-      top2: sticker.top2,
-      left2: sticker.left2,
-      rotate2: sticker.rotate2,
+      width: sticker.width2,
+      height: sticker.height2,
+      topPos: sticker.top2,
+      leftPos: sticker.left2,
+      rotate: sticker.rotate2,
     };
     useStickerStore.getState().updateSticker(stickerData);
-    sendWebSocketMessage('rotate_stop', object_type, stickerData);
+    sendWebSocketMessage('rotateStop', objectType, stickerData);
   };
 
   const onDelete = () => {
     // 서버로 삭제 요청 보내기
     websocket.current.send(
       JSON.stringify({
-        type: 'delete_object',
-        object_type: 'sticker',
-        object_id: stickerId,
+        type: 'deleteObject',
+        objectType: 'sticker',
+        objectId: stickerId,
       }),
     );
   };

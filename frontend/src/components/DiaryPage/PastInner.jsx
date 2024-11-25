@@ -26,7 +26,7 @@ function PastInner({ diaryId }) {
       try {
         const response = await baseInstance.get(`/diaries/${diaryId}`);
         if (response.data) {
-          const responseMonth = response.data.diary_data.year_month;
+          const responseMonth = response.data.diaryData.yearMonth;
 
           const month = responseMonth.split('-')[1];
           const numericMonth = month.startsWith('0')
@@ -38,7 +38,7 @@ function PastInner({ diaryId }) {
           console.log(
             `${numericMonth}월 ${response.data.day}일 다이어리 조회 성공!`,
           );
-          const diaryBgId = response.data.diary_data.diary_bg_id;
+          const diaryBgId = response.data.diaryData.diaryBgId;
           setInnerPage(diaryBgId);
           setHostName(response.data.nickname);
           setDiaryData(response.data);
@@ -85,7 +85,7 @@ function PastInner({ diaryId }) {
     }
     return diaryData.diaryTextBoxs.map((textBox) => (
       <div
-        key={textBox.textbox_id}
+        key={textBox.textboxId}
         style={{
           position: 'absolute',
           left: `${textBox.xcoor}px`,
@@ -106,9 +106,9 @@ function PastInner({ diaryId }) {
     }
     return diaryData.diaryStickers.map((sticker) => (
       <img
-        key={sticker.sticker_id}
-        src={sticker.sticker_image_url}
-        alt={`sticker-${sticker.sticker_id}`}
+        key={sticker.stickerId}
+        src={sticker.stickerImageUrl}
+        alt={`sticker-${sticker.stickerId}`}
         style={{
           position: 'absolute',
           left: `${sticker.xcoor}px`,

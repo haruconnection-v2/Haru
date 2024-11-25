@@ -20,8 +20,8 @@ function Stickers({ onDelete, image, parentRef }) {
 
   const handleSaveCalendarSticker = async () => {
     const stickerData = {
-      stickers_info: {
-        sticker_image_url: image,
+      stickersInfo: {
+        stickerImageUrl: image,
         topPos: position.top2,
         leftPos: position.left2,
         width: position.width2,

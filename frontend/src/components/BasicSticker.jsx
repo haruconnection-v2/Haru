@@ -15,14 +15,14 @@ function BasicSticker({ onStickerSelect, websocket }) {
     onStickerSelect(image);
     websocket.current.send(
       JSON.stringify({
-        type: 'create_sticker',
+        type: 'createSticker',
         image: image,
         position: {
-          top2: 100,
-          left2: 100,
-          width2: 100,
-          height2: 100,
-          rotate2: 0,
+          topPos: 100,
+          leftPos: 100,
+          width: 100,
+          height: 100,
+          rotate: 0,
         },
       }),
     );
@@ -39,7 +39,7 @@ function BasicSticker({ onStickerSelect, websocket }) {
         const data = response.data.data;
 
         // 이미지 URL을 상태에 업데이트
-        setStickerImages(data.st_image_urls);
+        setStickerImages(data.stImageUrls);
       } catch (error) {
         console.error('Error fetching sticker images:', error);
       }

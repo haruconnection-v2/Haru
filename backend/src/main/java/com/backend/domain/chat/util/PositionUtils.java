@@ -18,11 +18,11 @@ public class PositionUtils {
 		String id = payload.get(idKey).asText();
 		String url = payload.get("image").asText();
 		JsonNode stickerData = payload.get("position");
-		String width = stickerData.get("width2").asText();
-		String height = stickerData.get("height2").asText();
-		String top = stickerData.get("top2").asText();
-		String left = stickerData.get("left2").asText();
-		String rotate = stickerData.get("rotate2").asText();
+		String width = stickerData.get("width").asText();
+		String height = stickerData.get("height").asText();
+		String top = stickerData.get("topPos").asText();
+		String left = stickerData.get("leftPos").asText();
+		String rotate = stickerData.get("rotate").asText();
 
 		CreatePositionNodeDto createPositionNodeDto = CreatePositionNodeDto.builder()
 			.top(top)
@@ -34,7 +34,7 @@ public class PositionUtils {
 		ObjectNode objectNode = createPosition(createPositionNodeDto);
 
 		Map<String, Object> resultMap = new HashMap<>();
-		resultMap.put("id", id);
+		resultMap.put("stickerId", id);
 		resultMap.put("url", url);
 		resultMap.put("positionNode", objectNode);
 
@@ -44,8 +44,8 @@ public class PositionUtils {
 	public static Map<String, ObjectNode> extractTopAndLeftData(Map<String, JsonNode> payload, String idKey) {
 		String id = payload.get(idKey).asText();
 		JsonNode data = payload.get("position");
-		String top = data.get("top2").asText();
-		String left = data.get("left2").asText();
+		String top = data.get("topPos").asText();
+		String left = data.get("leftPos").asText();
 
 		CreatePositionNodeDto createPositionNodeDto = CreatePositionNodeDto.builder()
 			.top(top)
@@ -63,10 +63,10 @@ public class PositionUtils {
 		String id = payload.get(idKey).asText();
 		JsonNode data = payload.get("position");
 
-		String width = data.get("width2").asText();
-		String height = data.get("height2").asText();
-		String top = data.get("top2").asText();
-		String left = data.get("left2").asText();
+		String width = data.get("width").asText();
+		String height = data.get("height").asText();
+		String top = data.get("topPos").asText();
+		String left = data.get("leftPos").asText();
 
 		CreatePositionNodeDto createPositionNodeDto = CreatePositionNodeDto.builder()
 			.width(width)
@@ -85,7 +85,7 @@ public class PositionUtils {
 	public static Map<String, ObjectNode> extractRotateData(Map<String, JsonNode> payload, String idKey) {
 		String id = payload.get(idKey).asText();
 		JsonNode data = payload.get("position");
-		String rotate = data.get("rotate2").asText();
+		String rotate = data.get("rotate").asText();
 
 		CreatePositionNodeDto createPositionNodeDto = CreatePositionNodeDto.builder()
 			.rotate(rotate)
@@ -100,36 +100,36 @@ public class PositionUtils {
 
 	private static ObjectNode createPosition(CreatePositionNodeDto dto) {
 		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("top2", dto.getTop());
-		positionNode.put("left2", dto.getLeft());
-		positionNode.put("width2", dto.getWidth());
-		positionNode.put("height2", dto.getHeight());
-		positionNode.put("rotate2", dto.getRotate());
+		positionNode.put("topPos", dto.getTop());
+		positionNode.put("leftPos", dto.getLeft());
+		positionNode.put("width", dto.getWidth());
+		positionNode.put("height", dto.getHeight());
+		positionNode.put("rotate", dto.getRotate());
 
 		return positionNode;
 	}
 
 	private static ObjectNode updateTopLeftPosition(CreatePositionNodeDto dto) {
 		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("top2", dto.getTop());
-		positionNode.put("left2", dto.getLeft());
+		positionNode.put("topPos", dto.getTop());
+		positionNode.put("leftPos", dto.getLeft());
 
 		return positionNode;
 	}
 
 	private static ObjectNode updatePositionWithoutRotate(CreatePositionNodeDto dto) {
 		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("top2", dto.getTop());
-		positionNode.put("left2", dto.getLeft());
-		positionNode.put("width2", dto.getWidth());
-		positionNode.put("height2", dto.getHeight());
+		positionNode.put("topPos", dto.getTop());
+		positionNode.put("leftPos", dto.getLeft());
+		positionNode.put("width", dto.getWidth());
+		positionNode.put("height", dto.getHeight());
 
 		return positionNode;
 	}
 
 	private static ObjectNode updateRotatePosition(CreatePositionNodeDto dto) {
 		ObjectNode positionNode = JsonNodeFactory.instance.objectNode();
-		positionNode.put("rotate2", dto.getRotate());
+		positionNode.put("rotate", dto.getRotate());
 
 		return positionNode;
 	}

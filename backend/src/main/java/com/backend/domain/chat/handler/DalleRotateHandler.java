@@ -17,14 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 public class DalleRotateHandler implements MessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
-		Map<String, ObjectNode> resultMap = PositionUtils.extractRotateData(payload, "dalle_id");
+		Map<String, ObjectNode> resultMap = PositionUtils.extractRotateData(payload, "dalleId");
 
 		String dalleId = resultMap.keySet().iterator().next();
 		ObjectNode positionNode = resultMap.get(dalleId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "dalle_rotate");
-		response.put("dalle_id", dalleId);
+		response.put("type", "dalleRotate");
+		response.put("dalleId", dalleId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);

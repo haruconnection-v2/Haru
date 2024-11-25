@@ -1,7 +1,6 @@
 package com.backend.domain.diary.mapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
@@ -59,7 +58,7 @@ public class DiaryMapper {
 		return DiaryStickerResDto.builder()
 			.stickerId(sticker.getId())
 			.stickerImageUrl(sticker.getStickerImageUrl())
-			.top(sticker.getTop())
+			.top(sticker.getTopPos())
 			.leftPos(sticker.getLeftPos())
 			.width(sticker.getWidth())
 			.height(sticker.getHeight())
@@ -101,7 +100,7 @@ public class DiaryMapper {
 	private static DiarySticker toDiarySticker(DiaryStickerReqDto sticker, Diary diary) {
 		return DiarySticker.builder()
 			.stickerImageUrl(sticker.getStickerImageUrl())
-			.top(sticker.getTop())
+			.topPos(sticker.getTop())
 			.leftPos(sticker.getLeftPos())
 			.height(sticker.getHeight())
 			.width(sticker.getWidth())

@@ -20,7 +20,7 @@ public class DiarySticker extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String stickerImageUrl;
-	private int top;
+	private int topPos;
 	private int leftPos;
 	private int width;
 	private int height;
@@ -33,9 +33,9 @@ public class DiarySticker extends BaseEntity {
 	}
 
 	@Builder
-	public DiarySticker(String stickerImageUrl, int top, int leftPos, int width, int height, int rotate, Diary diary) {
+	public DiarySticker(String stickerImageUrl, int topPos, int leftPos, int width, int height, int rotate, Diary diary) {
 		this.stickerImageUrl = stickerImageUrl;
-		this.top = top;
+		this.topPos = topPos;
 		this.leftPos = leftPos;
 		this.width = width;
 		this.height = height;
@@ -44,7 +44,7 @@ public class DiarySticker extends BaseEntity {
 	}
 
 	public void updateDiarySticker(UpdateDiaryStickerReq updateDiaryStickerReq) {
-		this.top = updateDiaryStickerReq.getTop();
+		this.topPos = updateDiaryStickerReq.getTopPos();
 		this.leftPos = updateDiaryStickerReq.getLeftPos();
 		this.width = updateDiaryStickerReq.getWidth();
 		this.height = updateDiaryStickerReq.getHeight();

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WebSocketMessageReq {
 	private String type;
+	private Long id;
 	private Map<String, JsonNode> payload = new HashMap<>();
 
 	// @JsonAnySetter -> 나머지 필드 저장

@@ -29,6 +29,8 @@ services:
       - "8080:8080"
     networks:
       - haru-network
+    command: [ "java", "-jar", "/app.jar" ]
+
 
   frontend: #프론트 엔드 서비스를 만듬
     build:
@@ -71,3 +73,4 @@ networks:
 volumes:
   build_folder:
   mysql-data:
+

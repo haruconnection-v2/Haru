@@ -51,7 +51,7 @@ function TextBox({
           stomp.current.publish({
             destination: `/send/${diaryId}`,
             body: JSON.stringify({
-              type: 'save_text',
+              type: 'saveText',
               id: textId,
               content: text.content,
               nickname: text.nickname,
@@ -125,9 +125,36 @@ function TextBox({
       body: JSON.stringify(message),
     });
   };
+  const sendMessage = (
+      destination,
+      type,
+      updatedPosition,
+      content = null,
+      nickname = null,
+  ) => {
+    const message = {
+      type,
+      id: textId,
+      position: updatedPosition,
+    };
+
+    if (content !== null) {
+      message.content = content;
+    }
+
+    if (nickname !== null) {
+      message.nickname = nickname;
+    }
+
+    stomp.current.publish({
+      destination: `/send/${destination}/${diaryId}`,
+      body: JSON.stringify(message),
+    });
+  };
 
   const handleDrag = (e, d) => {
-    sendStompMessage('text_drag', {
+    console.log('저장된 content:', textId);
+    sendMessage('position','textDrag', {
       x: Math.round(d.x),
       y: Math.round(d.y),
     });
@@ -137,7 +164,7 @@ function TextBox({
     const width = Math.round(parseFloat(ref.style.width));
     const height = Math.round(parseFloat(ref.style.height));
 
-    sendStompMessage('text_resize', {
+    sendMessage('positoin', 'textResize', {
       width: width,
       height: height,
     });
@@ -148,16 +175,16 @@ function TextBox({
     stomp.current.publish({
       destination: `/send/${diaryId}`,
       body: JSON.stringify({
-        type: 'delete_object',
-        object_type: 'text',
-        object_id: textId,
+        type: 'deleteObject',
+        objectType: 'text',
+        objectId: textId,
       }),
     });
   };
 
   const handleCompositionEnd = (e) => {
     console.log('Composition ended');
-    sendStompMessage('text_input', null, e.target.value);
+    sendStompMessage('textInput', null, e.target.value);
   };
 
   const handleTextChange = (e) => {
@@ -168,7 +195,7 @@ function TextBox({
 
   const handleNicknameCompositionEnd = (e) => {
     console.log('Nickname composition ended');
-    sendStompMessage('nickname_input', null, null, e.target.value);
+    sendStompMessage('nicknameInput', null, null, e.target.value);
   };
 
   const handleNicknameChange = (e) => {

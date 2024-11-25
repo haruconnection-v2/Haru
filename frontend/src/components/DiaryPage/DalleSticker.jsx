@@ -34,15 +34,15 @@ function DalleSticker({ dalleId, image, bounds, websocket }) {
         if (result.isConfirmed) {
           websocket.current.send(
             JSON.stringify({
-              type: 'save_dalle',
+              type: 'saveDalle',
               id: dalleId,
               image: image,
               position: {
-                top2: dalle.top2,
-                left2: dalle.left2,
-                width2: dalle.width2,
-                height2: dalle.height2,
-                rotate2: dalle.rotate2,
+                topPos: dalle.top2,
+                leftPos: dalle.left2,
+                width: dalle.width2,
+                height: dalle.height2,
+                rotate: dalle.rotate2,
               },
             }),
           );
@@ -85,7 +85,7 @@ function DalleSticker({ dalleId, image, bounds, websocket }) {
       JSON.stringify({
         type,
         id: dalleId,
-        object_type: objectType,
+        objectType: objectType,
         position: updatedPosition,
       }),
     );
@@ -100,78 +100,78 @@ function DalleSticker({ dalleId, image, bounds, websocket }) {
     const roundedTop = Math.round(newTop);
     const roundedLeft = Math.round(newLeft);
 
-    sendWebSocketMessage('dalle_drag', {
-      top2: roundedTop,
-      left2: roundedLeft,
+    sendWebSocketMessage('dalleDrag', {
+      topPos: roundedTop,
+      leftPos: roundedLeft,
     });
   };
 
   const handleResize = (style, isShiftKey, type) => {
     const position = {
-      width2: Math.round(style.width),
-      height2: Math.round(style.height),
-      top2: Math.round(style.top),
-      left2: Math.round(style.left),
+      width: Math.round(style.width),
+      height: Math.round(style.height),
+      topPos: Math.round(style.top),
+      leftPos: Math.round(style.left),
     };
 
-    sendWebSocketMessage('dalle_resize', position);
+    sendWebSocketMessage('dalleResize', position);
   };
 
   const handleRotate = (rotateAngle) => {
     console.log('회전');
     const roundedRotate = Math.round(rotateAngle);
-    sendWebSocketMessage('dalle_rotate', { rotate2: roundedRotate });
+    sendWebSocketMessage('dalleRotate', { rotate: roundedRotate });
   };
 
   const handleDragStop = () => {
-    object_type = 'dalle';
+    const objectType = 'dalle';
     const dalleData = {
       image: image,
-      width2: dalle.width2,
-      height2: dalle.height2,
-      top2: dalle.top2,
-      left2: dalle.left2,
-      rotate2: dalle.rotate2,
+      width: dalle.width2,
+      height: dalle.height2,
+      topPos: dalle.top2,
+      leftPos: dalle.left2,
+      rotate: dalle.rotate2,
     };
     useDalleStore.getState().updateDalle(dalleData);
-    sendWebSocketMessage('drag_stop', object_type, dalleData);
+    sendWebSocketMessage('dragStop', objectType, dalleData);
   };
 
   const handleResizeStop = () => {
-    object_type = 'dalle';
+    const objectType = 'dalle';
     const dalleData = {
       image: image,
-      width2: dalle.width2,
-      height2: dalle.height2,
-      top2: dalle.top2,
-      left2: dalle.left2,
-      rotate2: dalle.rotate2,
+      width: dalle.width2,
+      height: dalle.height2,
+      topPos: dalle.top2,
+      leftPos: dalle.left2,
+      rotate: dalle.rotate2,
     };
     useDalleStore.getState().updateDalle(dalleData);
-    sendWebSocketMessage('resize_stop', object_type, dalleData);
+    sendWebSocketMessage('resizeStop', objectType, dalleData);
   };
 
   const handleRotateStop = () => {
-    object_type = 'dalle';
+    const objectType = 'dalle';
     const dalleData = {
       image: image,
-      width2: dalle.width2,
-      height2: dalle.height2,
-      top2: dalle.top2,
-      left2: dalle.left2,
-      rotate2: dalle.rotate2,
+      width: dalle.width2,
+      height: dalle.height2,
+      topPos: dalle.top2,
+      leftPos: dalle.left2,
+      rotate: dalle.rotate2,
     };
     useDalleStore.getState().updateDalle(dalleData);
-    sendWebSocketMessage('rotate_stop', object_type, dalleData);
+    sendWebSocketMessage('rotateStop', objectType, dalleData);
   };
 
   const onDelete = () => {
     // 서버로 삭제 요청 보내기
     websocket.current.send(
       JSON.stringify({
-        type: 'delete_object',
-        object_type: 'dalle',
-        object_id: dalleId,
+        type: 'deleteObject',
+        objectType: 'dalle',
+        objectId: dalleId,
       }),
     );
   };
@@ -211,10 +211,10 @@ function DalleSticker({ dalleId, image, bounds, websocket }) {
               dalleId: dalle.id,
               image: image,
               position: {
-                width2: dalle.width2,
-                height2: dalle.height2,
-                top2: dalle.top2 + 1,
-                left2: dalle.left2 + 1,
+                width: dalle.width2,
+                height: dalle.height2,
+                topPos: dalle.top2 + 1,
+                leftPos: dalle.left2 + 1,
                 rotate2: `${dalle.rotate2}deg`,
               },
             })

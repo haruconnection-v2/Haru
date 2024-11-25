@@ -50,7 +50,7 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
           const diaryBgId = response.data.data.diaryBgId;
           setInnerPage(diaryBgId);
           setHostName(response.data.nickname);
-          setHostId(response.data.login_id);
+          setHostId(response.data.loginId);
         }
       } catch (error) {
         console.log(`InnerImg에서 다이어리 조회 실패 : ${error.message}`);
@@ -93,7 +93,7 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
     }
     return diaryData.diaryTextBoxs.map((textBox) => (
       <div
-        key={textBox.textbox_id}
+        key={textBox.textboxId}
         style={{
           position: 'absolute',
           left: `${textBox.xcoor}px`,
@@ -114,9 +114,9 @@ function InnerImg({ websocket, diaryData, diaryId, setHostId }) {
     }
     return diaryData.diaryStickers.map((sticker) => (
       <img
-        key={sticker.sticker_id}
-        src={sticker.sticker_image_url}
-        alt={`sticker-${sticker.sticker_id}`}
+        key={sticker.stickerId}
+        src={sticker.stickerImageUrl}
+        alt={`sticker-${sticker.stickerId}`}
         style={{
           position: 'absolute',
           left: `${sticker.xcoor}px`,

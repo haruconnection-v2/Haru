@@ -2,7 +2,6 @@ package com.backend.domain.chat.handler;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
@@ -16,8 +15,6 @@ import com.backend.domain.diary.entity.DiarySticker;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryStickerRepository;
 import com.backend.domain.diary.repository.DiaryTextBoxRepository;
-import com.backend.global.common.exception.NotFoundException;
-import com.backend.global.common.response.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.RequiredArgsConstructor;
@@ -36,24 +33,24 @@ public class StopObjectHandler implements MessageHandler {
 	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
-		String objectType = payload.get("object_type").asText();
+		String objectType = payload.get("objectType").asText();
 		// 중복 코드 메서드화 하기
 		if (Objects.equals(objectType, "sticker")) {
 
 			String stickerId = payload.get("id").asText();
 			JsonNode stickerData = payload.get("position");
-			String width = stickerData.get("width2").asText();
-			String height = stickerData.get("height2").asText();
-			String top = stickerData.get("top2").asText();
-			String left = stickerData.get("left2").asText();
-			String rotate = stickerData.get("rotate2").asText();
+			String width = stickerData.get("width").asText();
+			String height = stickerData.get("height").asText();
+			String topPos = stickerData.get("topPos").asText();
+			String leftPos = stickerData.get("leftPos").asText();
+			String rotate = stickerData.get("rotate").asText();
 
 			DiarySticker diarySticker = diaryStickerUtils.fetchDiarySticker(stickerId);
 
 			UpdateDiaryStickerReq req = UpdateDiaryStickerReq.builder()
-				.top(Integer.parseInt(top))
+				.topPos(Integer.parseInt(topPos))
 				.height(Integer.parseInt(height))
-				.leftPos(Integer.parseInt(left))
+				.leftPos(Integer.parseInt(leftPos))
 				.rotate(Integer.parseInt(rotate))
 				.width(Integer.parseInt(width))
 				.build();

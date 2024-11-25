@@ -104,41 +104,41 @@ function DiaryPage() {
         if (message.body) {
           const data = JSON.parse(message.body); // STOMP 메시지 파싱
           console.log('수신된 메시지:', data);
-          if (data.type === 'create_sticker') {
+          if (data.type === 'createSticker') {
             console.log('스티커 생성');
             useStickerStore.getState().addSticker({
-              id: data.sticker_id,
+              id: data.id,
               image: data.image,
               ...data.position,
             });
-          } else if (data.type === 'image_drag') {
+          } else if (data.type === 'imageDrag') {
             console.log('드래그 발생');
             useStickerStore.getState().updateSticker({
-              id: data.sticker_id,
+              id: data.id,
               ...data.position,
             });
-          } else if (data.ype === 'image_resize') {
+          } else if (data.type === 'imageResize') {
             console.log('리사이즈 발생');
             useStickerStore.getState().updateSticker({
-              id: data.stickerId,
+              id: data.id,
               ...data.position,
             });
-          } else if (data.type === 'image_rotate') {
+          } else if (data.type === 'imageRotate') {
             console.log('로테이트 발생');
             useStickerStore.getState().updateSticker({
-              id: data.sticker_id,
+              id: data.id,
               ...data.position,
             });
-          } else if (data.type === 'delete_object') {
+          } else if (data.type === 'deleteObject') {
             console.log('삭제');
 
-            useStickerStore.getState().deleteSticker(data.object_id);
-            useTextStore.getState().deleteText(data.object_id);
-            useDalleStore.getState().deleteDalle(data.object_id);
-          } else if (data.type === 'save_sticker') {
+            useStickerStore.getState().deleteSticker(data.objectId);
+            useTextStore.getState().deleteText(data.objectId);
+            useDalleStore.getState().deleteDalle(data.objectId);
+          } else if (data.type === 'saveSticker') {
             console.log('스티커 저장');
             useStickerStore.getState().updateSticker({
-              id: data.sticker_id,
+              id: data.id,
               image: data.image,
               showOnly: true,
               ...data.position,
@@ -148,45 +148,45 @@ function DiaryPage() {
               stickers: [
                 ...prevData.stickers,
                 {
-                  sticker_id: data.sticker_id,
-                  sticker_image_url: data.image,
-                  top: data.position.top2,
-                  left: data.position.left2,
-                  height: data.position.height2,
-                  width: data.position.width2,
-                  rotate: data.position.rotate2 || 0, // rotate가 없는 경우 기본값 0
+                  stickerId: data.id,
+                  stickerImageUrl: data.image,
+                  top: data.position.topPos,
+                  left: data.position.leftPos,
+                  height: data.position.height,
+                  width: data.position.width,
+                  rotate: data.position.rotate || 0, // rotate가 없는 경우 기본값 0
                 },
               ],
             }));
           }
           // Dalle
-          if (data.type === 'create_dalle') {
+          if (data.type === 'createDalle') {
             console.log('Dalle 생성');
             useDalleStore.getState().addDalle({
-              id: data.dalle_id,
+              id: data.id,
               image: data.image,
               ...data.position,
             });
-          } else if (data.type === 'dalle_drag') {
+          } else if (data.type === 'dalleDrag') {
             console.log('dalle 드래그 발생');
             useDalleStore
               .getState()
-              .updateDalle({ id: data.dalle_id, ...data.position });
-          } else if (data.type === 'dalle_resize') {
+              .updateDalle({ id: data.dalleId, ...data.position });
+          } else if (data.type === 'dalleResize') {
             console.log('dalle 리사이즈 발생');
             useDalleStore.getState().updateDalle({
-              id: data.dalle_id,
+              id: data.id,
               ...data.data.position,
             });
-          } else if (data.type === 'dalle_rotate') {
+          } else if (data.type === 'dalleRotate') {
             console.log('dalle 로테이트 발생');
             useDalleStore
               .getState()
-              .updateDalle({ id: data.dalle_id, ...data.position });
-          } else if (data.type === 'save_dalle') {
+              .updateDalle({ id: data.dalleId, ...data.position });
+          } else if (data.type === 'saveDalle') {
             console.log('Dalle 저장');
             useDalleStore.getState().updateDalle({
-              id: data.dalle_id,
+              id: data.id,
               image: data.image,
               showOnly: true,
               ...data.position,
@@ -196,52 +196,52 @@ function DiaryPage() {
               stickers: [
                 ...prevData.stickers,
                 {
-                  sticker_id: data.dalle_id,
-                  sticker_image_url: data.image,
-                  top: data.position.top2,
-                  left: data.position.left2,
-                  height: data.position.height2,
-                  width: data.position.width2,
-                  rotate: data.position.rotate2 || 0, // rotate가 없는 경우 기본값 0
+                  stickerId: data.id,
+                  stickerImageUrl: data.image,
+                  top: data.position.topPos,
+                  left: data.position.leftPos,
+                  height: data.position.height,
+                  width: data.position.width,
+                  rotate: data.position.rotate || 0, // rotate가 없는 경우 기본값 0
                 },
               ],
             }));
           }
           // 텍스트 박스
-          if (data.type === 'create_textbox') {
+          if (data.type === 'createTextbox') {
             console.log('텍스트 박스 생성');
             useTextStore.getState().addText({
-              id: data.text_id,
+              id: data.id,
               ...data.position,
             });
-          } else if (data.type === 'text_drag') {
+          } else if (data.type === 'textDrag') {
             console.log('텍스트 드래그 발생');
             useTextStore
               .getState()
-              .updateText({ id: data.text_id, ...data.position });
-          } else if (data.type === 'text_resize') {
+              .updateText({ id: data.id, ...data.position });
+          } else if (data.type === 'textResize') {
             console.log('텍스트 리사이즈 발생');
             useTextStore
               .getState()
-              .updateText({ id: data.text_id, ...data.position });
-          } else if (data.type === 'text_input') {
+              .updateText({ id: data.id, ...data.position });
+          } else if (data.type === 'textInput') {
             console.log('텍스트 입력 발생');
             console.log('입력값:', data.content);
             useTextStore.getState().updateText({
-              id: data.text_id,
+              id: data.id,
               content: data.content,
             });
-          } else if (data.type === 'nickname_input') {
+          } else if (data.type === 'nicknameInput') {
             console.log('닉네임 입력 발생');
             console.log('입력값:', data.nickname);
             useTextStore.getState().updateText({
-              id: data.text_id,
+              id: data.id,
               nickname: data.nickname,
             });
-          } else if (data.type === 'save_text') {
-            console.log('save_text');
+          } else if (data.type === 'saveText') {
+            console.log('saveText');
             useTextStore.getState().updateText({
-              id: data.text_id,
+              id: data.id,
               content: data.content,
               nickname: data.nickname,
               showOnly: true,
@@ -252,7 +252,7 @@ function DiaryPage() {
               textboxs: [
                 ...prevData.textboxs,
                 {
-                  textbox_id: data.text_id,
+                  textboxId: data.id,
                   writer: data.nickname,
                   xcoor: data.position.x,
                   ycoor: data.position.y,

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateDiaryStickerReq {
 
-	private final int top;
+	private final int topPos;
 	private final int leftPos;
 	private final int width;
 	private final int height;

@@ -23,8 +23,8 @@ public class TextResizeHandler implements MessageHandler {
 		ObjectNode positionNode = resultMap.get(textId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "text_resize");
-		response.put("text_id", textId);
+		response.put("type", "textResize");
+		response.put("id", textId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);

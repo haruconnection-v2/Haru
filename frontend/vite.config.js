@@ -14,4 +14,3 @@ export default defineConfig({
     },
   },
 });
-// target: 'https://haruconnection.store:8000', // 배포용

@@ -17,14 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageRotateHandler implements MessageHandler {
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
-		Map<String, ObjectNode> resultMap = PositionUtils.extractRotateData(payload, "sticker_id");
+		Map<String, ObjectNode> resultMap = PositionUtils.extractRotateData(payload, "stickerId");
 
 		String stickerId = resultMap.keySet().iterator().next();
 		ObjectNode positionNode = resultMap.get(stickerId);
 
 		ObjectNode response = JsonNodeFactory.instance.objectNode();
-		response.put("type", "image_rotate");
-		response.put("sticker_id", stickerId);
+		response.put("type", "imageRotate");
+		response.put("stickerId", stickerId);
 		response.set("position", positionNode);
 
 		log.info("Response created: {}", response);
