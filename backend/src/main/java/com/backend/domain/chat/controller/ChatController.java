@@ -58,8 +58,9 @@ public class ChatController {
             throws JsonProcessingException {
         WebSocketMessageReq webSocketMessage = objectMapper.readValue(payload,
                 WebSocketMessageReq.class);
-        CompletableFuture<JsonNode> response = webSocketService.positionProcess(roomId,
-                webSocketMessage.getType(), webSocketMessage.getPayload());
+        log.info("chatController.positionChat: {}", payload);
+        CompletableFuture<JsonNode> response = webSocketService.positionProcess(webSocketMessage.getType(),
+                webSocketMessage.getId(), webSocketMessage.getPayload());
 
         if (response == null) {
             throw new IllegalArgumentException("Handler did not return any response");

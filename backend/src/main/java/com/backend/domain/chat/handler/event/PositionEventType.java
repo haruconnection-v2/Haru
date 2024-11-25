@@ -6,11 +6,11 @@ import lombok.Getter;
 
 @Getter
 public enum PositionEventType {
-    IMAGE_DRAG("position", TextNode.valueOf("imageDrag"), "stickerId"),
-    IMAGE_RESIZE("position", TextNode.valueOf("imageResize"), "stickerId"),
-    IMAGE_ROTATE("position", TextNode.valueOf("imageRotate"), "stickerId"),
-    TEXT_DRAG("position", TextNode.valueOf("textDrag"), "textId"),
-    TEXT_RESIZE("position", TextNode.valueOf("textResize"), "textId");
+    IMAGE_DRAG("position", TextNode.valueOf("imageDrag"), "id"),
+    IMAGE_RESIZE("position", TextNode.valueOf("imageResize"), "id"),
+    IMAGE_ROTATE("position", TextNode.valueOf("imageRotate"), "id"),
+    TEXT_DRAG("position", TextNode.valueOf("textDrag"), "id"),
+    TEXT_RESIZE("position", TextNode.valueOf("textResize"), "id");
 
     private final String handlerType;
     private final TextNode eventType;

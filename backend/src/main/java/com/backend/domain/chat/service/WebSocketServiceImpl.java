@@ -114,11 +114,13 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public CompletableFuture<JsonNode> positionProcess(Long roomId, String type,
+    public CompletableFuture<JsonNode> positionProcess(String type, Long objectId,
             Map<String, JsonNode> payload) {
+        log.info("websocketService.positionProcess: {}", payload);
         PositionEventType eventType = PositionEventType.setType(type);
-        return positionEventProcessor.submitEvent(roomId, payload.get(eventType.getIdType()).asText(),
-                () -> positionEventHandler.handle(eventType, payload)
+        //String objectId = payload.get(eventType.getIdType()).asText();
+        return positionEventProcessor.submitEvent(objectId ,
+                () -> positionEventHandler.handle(objectId, eventType, payload)
         );
     }
 }

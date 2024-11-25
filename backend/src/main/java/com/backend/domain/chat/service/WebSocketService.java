@@ -14,6 +14,6 @@ public interface WebSocketService {
 
 	public CompletableFuture<JsonNode> registerHandler(Long roomId, String type, Map<String, JsonNode> payload);
 
-	public CompletableFuture<JsonNode> positionProcess(Long roomId, String type, Map<String, JsonNode> payload);
+	public CompletableFuture<JsonNode> positionProcess(String type, Long objectId, Map<String, JsonNode> payload);
 
 }

@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class PositionEventHandler {
 
-    public CompletableFuture<JsonNode> handle(PositionEventType positionEventType,
+    public CompletableFuture<JsonNode> handle(Long objectId, PositionEventType positionEventType,
             Map<String, JsonNode> payload) {
-        JsonNode objectId = payload.get(positionEventType.getIdType()); //objectId
+        //JsonNode objectId = payload.get(positionEventType.getIdType()); //objectId
         JsonNode positionData = payload.get(positionEventType.getHandlerType());
         ObjectNode response = JsonNodeFactory.instance.objectNode();
         response.set("type", positionEventType.getEventType()); //type
-        response.set(positionEventType.getIdType(), objectId);
+        response.set(positionEventType.getIdType(), TextNode.valueOf(objectId.toString()));
         response.set(positionEventType.getHandlerType(), positionData);
 
         log.info("Response created: {}", response);
