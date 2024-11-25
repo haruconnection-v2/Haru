@@ -1,8 +1,5 @@
 package com.backend.domain.chat.service;
 
-import com.backend.domain.chat.handler.PositionEventHandler;
-import com.backend.domain.chat.handler.event.PositionEventType;
-import com.backend.domain.chat.handler.event.eventProcessor.PositionEventProcessor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -42,85 +39,70 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class WebSocketServiceImpl implements WebSocketService {
 
-    private final PositionEventProcessor positionEventProcessor;
-    private final PositionEventHandler positionEventHandler;
+	private final TextInputHandler textInputHandler;
+	private final NicknameInputHandler nicknameInputHandler;
+	private final TextDragHandler textDragHandler;
+	private final TextResizeHandler textResizeHandler;
+	private final SaveTextHandler saveTextHandler;
+	private final CreateTextbox createTextbox;
+	private final ImageDragHandler imageDragHandler;
+	private final ImageResizeHandler imageResizeHandler;
+	private final ImageRotateHandler imageRotateHandler;
+	private final SaveStickerHandler saveStickerHandler;
+	private final CreateStickerHandler createStickerHandler;
+	private final DalleDragHandler dalleDragHandler;
+	private final DalleResizeHandler dalleResizeHandler;
+	private final DalleRotateHandler dalleRotateHandler;
+	private final SaveDalleHandler saveDalleHandler;
+	private final CreateDalleHandler createDalleHandler;
+	private final DeleteObjectHandler deleteObjectHandler;
+	private final StopObjectHandler stopObjectHandler;
 
-    private final TextInputHandler textInputHandler;
-    private final NicknameInputHandler nicknameInputHandler;
-    private final TextDragHandler textDragHandler;
-    private final TextResizeHandler textResizeHandler;
-    private final SaveTextHandler saveTextHandler;
-    private final CreateTextbox createTextbox;
-    private final ImageDragHandler imageDragHandler;
-    private final ImageResizeHandler imageResizeHandler;
-    private final ImageRotateHandler imageRotateHandler;
-    private final SaveStickerHandler saveStickerHandler;
-    private final CreateStickerHandler createStickerHandler;
-    private final DalleDragHandler dalleDragHandler;
-    private final DalleResizeHandler dalleResizeHandler;
-    private final DalleRotateHandler dalleRotateHandler;
-    private final SaveDalleHandler saveDalleHandler;
-    private final CreateDalleHandler createDalleHandler;
-    private final DeleteObjectHandler deleteObjectHandler;
-    private final StopObjectHandler stopObjectHandler;
+	private final Map<String, MessageHandler> handlerMap = new HashMap<>();
+	private final Map<String, RoomMessageHandler> roomHandlerMap = new HashMap<>();
 
-    private final Map<String, MessageHandler> handlerMap = new HashMap<>();
-    private final Map<String, RoomMessageHandler> roomHandlerMap = new HashMap<>();
+	@Override
+	@PostConstruct
+	public void initializeHandlers() {
+		handlerMap.put("text_input", textInputHandler);
+		handlerMap.put("nickname_input", nicknameInputHandler);
+		handlerMap.put("text_drag", textDragHandler);
+		handlerMap.put("text_resize", textResizeHandler);
+		handlerMap.put("save_text", saveTextHandler);
+		handlerMap.put("image_drag", imageDragHandler);
+		handlerMap.put("image_resize", imageResizeHandler);
+		handlerMap.put("image_rotate", imageRotateHandler);
+		handlerMap.put("save_sticker", saveStickerHandler);
+		handlerMap.put("dalle_drag", dalleDragHandler);
+		handlerMap.put("dalle_resize", dalleResizeHandler);
+		handlerMap.put("dalle_rotate", dalleRotateHandler);
+		handlerMap.put("save_dalle", saveDalleHandler);
+		handlerMap.put("delete_object", deleteObjectHandler);
+		handlerMap.put("drag_stop", stopObjectHandler);
+		handlerMap.put("rotate_stop", stopObjectHandler);
+		handlerMap.put("resize_stop", stopObjectHandler);
 
-    @Override
-    @PostConstruct
-    public void initializeHandlers() {
-        handlerMap.put("textInput", textInputHandler);
-        handlerMap.put("nicknameInput", nicknameInputHandler);
-        handlerMap.put("textDrag", textDragHandler);
-        handlerMap.put("textResize", textResizeHandler);
-        handlerMap.put("saveText", saveTextHandler);
-        handlerMap.put("imageDrag", imageDragHandler);
-        handlerMap.put("imageResize", imageResizeHandler);
-        handlerMap.put("imageRotate", imageRotateHandler);
-        handlerMap.put("saveSticker", saveStickerHandler);
-        handlerMap.put("dalleDrag", dalleDragHandler);
-        handlerMap.put("dalleResize", dalleResizeHandler);
-        handlerMap.put("dalleRotate", dalleRotateHandler);
-        handlerMap.put("saveDalle", saveDalleHandler);
-        handlerMap.put("deleteObject", deleteObjectHandler);
-        handlerMap.put("dragStop", stopObjectHandler);
-        handlerMap.put("rotateStop", stopObjectHandler);
-        handlerMap.put("resizeStop", stopObjectHandler);
+		roomHandlerMap.put("create_textbox", createTextbox);
+		roomHandlerMap.put("create_sticker", createStickerHandler);
+		roomHandlerMap.put("create_dalle", createDalleHandler);
+	}
 
-        roomHandlerMap.put("createTextbox", createTextbox);
-        roomHandlerMap.put("createSticker", createStickerHandler);
-        roomHandlerMap.put("createDalle", createDalleHandler);
-    }
+	@Override
+	public CompletableFuture<JsonNode> registerHandler(Long roomId, String type, Map<String, JsonNode> payload) {
+		MessageHandler handler = handlerMap.get(type);
 
-    @Override
-    public CompletableFuture<JsonNode> registerHandler(Long roomId, String type,
-            Map<String, JsonNode> payload) {
-        MessageHandler handler = handlerMap.get(type);
+		//TODO need refactor
+		if (handler == null) {
+			RoomMessageHandler roomHandler = roomHandlerMap.get(type);
 
-        //TODO need refactor
-        if (handler == null) {
-            RoomMessageHandler roomHandler = roomHandlerMap.get(type);
+			if (roomHandler == null) {
+				log.error("No handler found for type: {} in roomId: {}", type, roomId);
+				throw new IllegalArgumentException("No handler found for type: " + type + " in roomId: " + roomId);
+			}
 
-            if (roomHandler == null) {
-                log.error("No handler found for type: {} in roomId: {}", type, roomId);
-                throw new IllegalArgumentException(
-                        "No handler found for type: " + type + " in roomId: " + roomId);
-            }
+			return roomHandler.handle(roomId, payload);
+		}
 
-            return roomHandler.handle(roomId, payload);
-        }
-        return handler.handle(payload);
-    }
-
-    @Override
-    public CompletableFuture<JsonNode> positionProcess(String type, Long objectId,
-            Map<String, JsonNode> payload) {
-        log.info("websocketService.positionProcess: {}", payload);
-        PositionEventType eventType = PositionEventType.setType(type);
-        //String objectId = payload.get(eventType.getIdType()).asText();
-        return positionEventProcessor.submitEvent(objectId ,
-                () -> positionEventHandler.handle(objectId, eventType, payload)
-        );
-    }
+		return handler.handle(payload);
+	}
 }
