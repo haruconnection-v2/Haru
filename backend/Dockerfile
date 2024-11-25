@@ -10,3 +10,4 @@ RUN ./gradlew bootJAR
 
 FROM openjdk:17
 COPY --from=builder build/libs/*.jar app.jar
+
