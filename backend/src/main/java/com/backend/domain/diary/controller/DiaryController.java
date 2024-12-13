@@ -30,7 +30,7 @@ public class DiaryController {
 
 	@GetMapping("/diaries/{diaryId}")
 	public ResponseEntity<ResultResponse<DiaryResponse>> getDiaryDetail(@PathVariable Long diaryId, HttpServletRequest request) {
-		DiaryResponse diaryResponse = diaryService.getDiaryDetialData(diaryId, request);
+		DiaryResponse diaryResponse = diaryService.getDiaryDetailData(diaryId, request);
 		ResultResponse<DiaryResponse> resultResponse = ResultResponse.of(FIND_DIARY_SUCCESS, diaryResponse);
 		return ResponseEntity.status(FIND_DIARY_SUCCESS.getHttpStatus()).body(resultResponse);
 	}

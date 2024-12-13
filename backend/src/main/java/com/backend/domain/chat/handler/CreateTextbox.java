@@ -26,7 +26,6 @@ public class CreateTextbox implements RoomMessageHandler {
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final HaruRoomUtils haruRoomUtils;
 
-	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
 

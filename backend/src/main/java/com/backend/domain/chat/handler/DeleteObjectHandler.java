@@ -30,7 +30,6 @@ public class DeleteObjectHandler implements MessageHandler {
 	private final DiaryStickerUtils diaryStickerUtils;
 	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
-	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 

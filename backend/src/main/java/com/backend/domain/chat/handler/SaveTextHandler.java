@@ -21,13 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SaveTextHandler implements MessageHandler {
+public class SaveTextHandler  {
 
 	private final DiaryTextBoxRepository diaryTextBoxRepository;
 	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
-	@Async
-	@Override
+	@Async("taskExecutor")
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 
 		String textId = payload.get("id").asText();
@@ -64,7 +63,7 @@ public class SaveTextHandler implements MessageHandler {
 			.height(Integer.parseInt(height))
 			.build();
 
-		diaryTextBox.updateDiaryTextBox(req);
+		//diaryTextBox.updateDiaryTextBox(req);
 		diaryTextBoxRepository.save(diaryTextBox);
 
 		return CompletableFuture.completedFuture(response);

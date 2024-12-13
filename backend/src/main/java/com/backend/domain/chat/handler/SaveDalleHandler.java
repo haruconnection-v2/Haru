@@ -26,7 +26,6 @@ public class SaveDalleHandler implements MessageHandler {
     private final DiaryStickerRepository diaryStickerRepository;
     private final DiaryStickerUtils diaryStickerUtils;
 
-    @Async
     @Override
     public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 

@@ -180,83 +180,81 @@ function Stickers({ stickerId, image, websocket }) {
   };
 
   return (
-    <>
-      <div
+    <div
+      style={{
+        width: sticker.width2,
+        height: sticker.height2,
+        position: 'absolute',
+        zIndex: 1,
+      }}>
+      <CloseButton
+        onClick={onDelete}
+        style={{
+          left: sticker.left2 + sticker.width2 - 20,
+          top: sticker.top2 - 10,
+          zIndex: 200,
+        }}>
+        <img
+          style={{
+            width: '1rem',
+            height: '1rem',
+            top: '0.4rem',
+            left: '0.5rem',
+            position: 'absolute',
+          }}
+          src={xclose}
+          alt="close"
+        />
+      </CloseButton>
+      <ImgSaveBtn
+        onClick={() =>
+          ImgSaveClick({
+            websocket: websocket,
+            stickerId: sticker.id,
+            image: image,
+            position: {
+              width2: sticker.width2,
+              height2: sticker.height2,
+              top2: sticker.top2 + 1,
+              left2: sticker.left2 + 1,
+              rotate2: `${sticker.rotate2}deg`,
+            },
+          })
+        }
+        style={{
+          left: sticker.left2 + sticker.width2 - 35,
+          top: sticker.top2 + sticker.height2 + 10,
+        }}>
+        저장
+      </ImgSaveBtn>
+      <img
+        src={image}
         style={{
           width: sticker.width2,
           height: sticker.height2,
+          left: sticker.left2 + 1,
+          top: sticker.top2 + 1,
+          rotate: `${sticker.rotate2}deg`,
           position: 'absolute',
-          zIndex: 1,
-        }}>
-        <CloseButton
-          onClick={onDelete}
-          style={{
-            left: sticker.left2 + sticker.width2 - 20,
-            top: sticker.top2 - 10,
-            zIndex: 200,
-          }}>
-          <img
-            style={{
-              width: '1rem',
-              height: '1rem',
-              top: '0.4rem',
-              left: '0.5rem',
-              position: 'absolute',
-            }}
-            src={xclose}
-            alt="close"
-          />
-        </CloseButton>
-        <ImgSaveBtn
-          onClick={() =>
-            ImgSaveClick({
-              websocket: websocket,
-              stickerId: sticker.id,
-              image: image,
-              position: {
-                width2: sticker.width2,
-                height2: sticker.height2,
-                top2: sticker.top2 + 1,
-                left2: sticker.left2 + 1,
-                rotate2: `${sticker.rotate2}deg`,
-              },
-            })
-          }
-          style={{
-            left: sticker.left2 + sticker.width2 - 35,
-            top: sticker.top2 + sticker.height2 + 10,
-          }}>
-          저장
-        </ImgSaveBtn>
-        <img
-          src={image}
-          style={{
-            width: sticker.width2,
-            height: sticker.height2,
-            left: sticker.left2 + 1,
-            top: sticker.top2 + 1,
-            rotate: `${sticker.rotate2}deg`,
-            position: 'absolute',
-          }}
-          alt="Selected Sticker"
-        />
-        <ResizableRect
-          style={{ zIndex: 1000 }}
-          left={sticker.left2}
-          top={sticker.top2}
-          width={sticker.width2}
-          height={sticker.height2}
-          rotateAngle={sticker.rotate2}
-          zoomable="n, w, s, e, nw, ne, se, sw"
-          onRotate={handleRotate}
-          onResize={handleResize}
-          onDrag={handleDrag}
-          onDragStop={handleDragStop}
-          onResizeStop={handleResizeStop}
-          onRotateStop={handleRotateStop}
-        />
-      </div>
-    </>
+        }}
+        alt="Selected Sticker"
+      />
+      <ResizableRect
+        style={{ zIndex: 1000 }}
+        left={sticker.left2}
+        top={sticker.top2}
+        width={sticker.width2}
+        height={sticker.height2}
+        rotateAngle={sticker.rotate2}
+        zoomable="n, w, s, e, nw, ne, se, sw"
+        onRotate={handleRotate}
+        onResize={handleResize}
+        onDrag={handleDrag}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+        onRotateStop={handleRotateStop}
+      />
+    </div>
   );
 }
 

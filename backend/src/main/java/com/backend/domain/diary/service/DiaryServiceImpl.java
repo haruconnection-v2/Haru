@@ -36,59 +36,67 @@ class DiaryServiceImpl implements DiaryService {
 	//mapper에 member.nickname 추가예정
 	//session 로직 추가 예정
 	@Override
-	public DiaryResponse getDiaryDetialData(Long diaryId, HttpServletRequest request) {
-		Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
-		String nickname = request.getSession().getAttribute("nickname").toString();
+	public DiaryResponse getDiaryDetailData(final Long diaryId, final HttpServletRequest request) {
+		final Diary foundDiary = diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException(ErrorCode.DIARY_NOT_FOUND));
+		final String nickname = getNicknameFromSession(request);
 		return toDetailDiaryResponse(foundDiary, nickname);
 	}
 
 	@Override
-	public DiaryResponse getDiarySnsLink(String day, HttpServletRequest request) {
-		Long calendarId = (Long)request.getSession().getAttribute("calendarId");
+	public DiaryResponse getDiarySnsLink(final String day, final HttpServletRequest request) {
+		final Long calendarId = (Long)request.getSession().getAttribute("calendarId");
 		if (calendarId == null) {
 			throw new NotFoundException(ErrorCode.CALENDAR_NOT_FOUND);
 		}
-		DiarySnsDto diarySnsDto = diaryRepository.findDiarySnsByCalendarIdAndDay(calendarId, day);
+		final DiarySnsDto diarySnsDto = diaryRepository.findDiarySnsByCalendarIdAndDay(calendarId, day);
 		if (diarySnsDto.isExpiry()) {
 			throw new BadRequestException(ErrorCode.DIARY_GONE);
 		}
-		String nickname = request.getSession().getAttribute("nickname").toString();
+		final String nickname = request.getSession().getAttribute("nickname").toString();
 		//diaryResponse = setMemberNickname;
 		return toSnsDiaryResponse(diarySnsDto, nickname);
 	}
 
+	private String getNicknameFromSession(final HttpServletRequest request) {
+		final Object nickname = request.getSession().getAttribute("nickname");
+		if (nickname == null) {
+			return "undefined";
+		}
+		return nickname.toString();
+	}
+
 	@Override
 	@Transactional
-	public DiaryResponse createDiary(DiaryCreateRequest diaryRequest, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		Calendar calendar = calendarService.getOrCreateCalendar(session);
+	public DiaryResponse createDiary(final DiaryCreateRequest diaryRequest, final HttpServletRequest request) {
+		final HttpSession session = request.getSession();
+		final Calendar calendar = calendarService.getOrCreateCalendar(session);
 		validateDiaryNotExist(calendar.getId(), diaryRequest.getDay());
 
 		// diary, haruRoom entity 연관관계로 인해 diary 생성 후 link를 생성해야 함.
-		Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar));
-		HaruRoom haruRoom = generateHaruRoom(diary);
+		final Diary diary = diaryRepository.save(createDiaryEntity(diaryRequest, session, calendar));
+		final HaruRoom haruRoom = generateHaruRoom(diary);
 
-		String snsLink = generateSnsLink(request, haruRoom.getId());
+		final String snsLink = generateSnsLink(request, haruRoom.getId());
 		diary.updateDiaryLink(snsLink);
 		diaryRepository.save(diary);
 
-		String nickname = session.getAttribute("nickname").toString();
+		final String nickname = session.getAttribute("nickname").toString();
 		return toCreateDiaryResponse(diary, nickname);
 	}
 
-	private void validateDiaryNotExist(Long calendarId, String day) {
+	private void validateDiaryNotExist(final Long calendarId, final String day) {
 		if (diaryRepository.existsByCalendarIdAndDay(calendarId, day)) {
 			throw new ConflictException(ErrorCode.DIARY_CONFLICT);
 		}
 	}
 
-	private String generateSnsLink(HttpServletRequest request, Long roomId) {
-		String host = request.getServerName();
-		int port = request.getServerPort();
+	private String generateSnsLink(final HttpServletRequest request, final Long roomId) {
+		final String host = request.getServerName();
+		final int port = request.getServerPort();
 		return String.format("http://%s:%d/rooms/%d", host, port, roomId);
 	}
 
-	private Diary createDiaryEntity(DiaryCreateRequest diaryRequest, HttpSession session, Calendar calendar) {
+	private Diary createDiaryEntity(final DiaryCreateRequest diaryRequest, final HttpSession session, Calendar calendar) {
 		return Diary.builder()
 			.calendar(calendar)
 			.diaryBgId(diaryRequest.getDiaryBgId())
