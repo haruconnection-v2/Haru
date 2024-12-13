@@ -1,21 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
-import { useSelectDateInfoStore } from '../../src/stores/useSelectDateInfoStore';
-import { useParams } from 'react-router-dom';
+import {useSelectDateInfoStore} from '../../src/stores/useSelectDateInfoStore';
+import {useParams} from 'react-router-dom';
 import LargeSketchbook from '../components/LargeSketchbook';
 import NavigateBar from '../components/NavigateBar';
 import BasicSticker from '../components/BasicSticker';
-import RightSticker from '../components/DiaryPage/RightSticker';
 import DHomeButton from '../components/DiaryPage/DHomeButton';
 import SaveButton from '../components/DiaryPage/SaveButton';
 import TextButton from '../components/DiaryPage/TextButton';
 
 import InnerImg from '../components/DiaryPage/InnerImg';
-import useStickerStore from '../stores/stickerStore';
 import useTextStore from '../stores/textStore';
-import useDalleStore from '../stores/dalleStore';
 import useUserInfoStore from '../stores/userInfoStore';
-import { Stomp } from '@stomp/stompjs'; // STOMP 사용
+import useWebSocket from "../util/WebSocketConfig.js";
+import {handleEvent} from "../handler/EventHandler.js";
+import {textBoxActions} from "../stores/storeHelper.js"; // STOMP 사용
 
 const setMetaTags = ({
   title = '하루연결', // 기본 타이틀
@@ -31,7 +30,7 @@ const setMetaTags = ({
   }
 
   const descriptionTag = document.querySelector(
-    'meta[property="og:description"]',
+      'meta[property="og:description"]',
   );
   if (descriptionTag) {
     descriptionTag.setAttribute('content', description);
@@ -55,9 +54,7 @@ function DiaryPage() {
   const [selectedDalle, setSelectedDalle] = useState(null);
   const selectedDateInfo = useSelectDateInfoStore((state) => state);
   const { diaryId } = useParams();
-  const stompClient = useRef(null); // STOMP 클라이언트
-  const { userInfoList, addUserInfo, getUserInfo, removeUserInfo } =
-    useUserInfoStore();
+  const { userInfoList } = useUserInfoStore();
   const userId = userInfoList.map((user) => user.id);
   const [hostCheck, setHostCheck] = useState(true);
   const [hostId, setHostId] = useState('');
@@ -67,11 +64,13 @@ function DiaryPage() {
   });
 
   useEffect(() => {
-    if (userId == hostId) {
+    setHostCheck(true);
+/*    if (userId == hostId) {
       setHostCheck(true);
+
     } else {
       setHostCheck(false);
-    }
+    }*/
   }, [userId]);
 
   const handleTextButtonClick = () => {
@@ -86,242 +85,57 @@ function DiaryPage() {
     setSelectedDalle(image);
   };
 
-  useEffect(() => {
-    if (!diaryId) {
-      console.log('diaryId가 설정되지 않았습니다.');
-      return;
-    }
+  const stompClient =  useWebSocket(diaryId, handleEvent, nickname);
 
-    const url = `ws://44.215.101.154:8080/ws`;
-    const client = Stomp.client(url);
-    stompClient.current = client;
-
-    client.connect({}, () => {
-      console.log('WebSocket 연결됨');
-
-      // STOMP 구독 - 메시지 수신 처리
-      client.subscribe(`/harurooms/${diaryId}`, (message) => {
-        if (message.body) {
-          const data = JSON.parse(message.body); // STOMP 메시지 파싱
-          console.log('수신된 메시지:', data);
-          if (data.type === 'createSticker') {
-            console.log('스티커 생성');
-            useStickerStore.getState().addSticker({
-              id: data.id,
-              image: data.image,
-              ...data.position,
-            });
-          } else if (data.type === 'imageDrag') {
-            console.log('드래그 발생');
-            useStickerStore.getState().updateSticker({
-              id: data.id,
-              ...data.position,
-            });
-          } else if (data.type === 'imageResize') {
-            console.log('리사이즈 발생');
-            useStickerStore.getState().updateSticker({
-              id: data.id,
-              ...data.position,
-            });
-          } else if (data.type === 'imageRotate') {
-            console.log('로테이트 발생');
-            useStickerStore.getState().updateSticker({
-              id: data.id,
-              ...data.position,
-            });
-          } else if (data.type === 'deleteObject') {
-            console.log('삭제');
-
-            useStickerStore.getState().deleteSticker(data.objectId);
-            useTextStore.getState().deleteText(data.objectId);
-            useDalleStore.getState().deleteDalle(data.objectId);
-          } else if (data.type === 'saveSticker') {
-            console.log('스티커 저장');
-            useStickerStore.getState().updateSticker({
-              id: data.id,
-              image: data.image,
-              showOnly: true,
-              ...data.position,
-            });
-            setSavedData((prevData) => ({
-              ...prevData,
-              stickers: [
-                ...prevData.stickers,
-                {
-                  stickerId: data.id,
-                  stickerImageUrl: data.image,
-                  top: data.position.topPos,
-                  left: data.position.leftPos,
-                  height: data.position.height,
-                  width: data.position.width,
-                  rotate: data.position.rotate || 0, // rotate가 없는 경우 기본값 0
-                },
-              ],
-            }));
-          }
-          // Dalle
-          if (data.type === 'createDalle') {
-            console.log('Dalle 생성');
-            useDalleStore.getState().addDalle({
-              id: data.id,
-              image: data.image,
-              ...data.position,
-            });
-          } else if (data.type === 'dalleDrag') {
-            console.log('dalle 드래그 발생');
-            useDalleStore
-              .getState()
-              .updateDalle({ id: data.dalleId, ...data.position });
-          } else if (data.type === 'dalleResize') {
-            console.log('dalle 리사이즈 발생');
-            useDalleStore.getState().updateDalle({
-              id: data.id,
-              ...data.data.position,
-            });
-          } else if (data.type === 'dalleRotate') {
-            console.log('dalle 로테이트 발생');
-            useDalleStore
-              .getState()
-              .updateDalle({ id: data.dalleId, ...data.position });
-          } else if (data.type === 'saveDalle') {
-            console.log('Dalle 저장');
-            useDalleStore.getState().updateDalle({
-              id: data.id,
-              image: data.image,
-              showOnly: true,
-              ...data.position,
-            });
-            setSavedData((prevData) => ({
-              ...prevData,
-              stickers: [
-                ...prevData.stickers,
-                {
-                  stickerId: data.id,
-                  stickerImageUrl: data.image,
-                  top: data.position.topPos,
-                  left: data.position.leftPos,
-                  height: data.position.height,
-                  width: data.position.width,
-                  rotate: data.position.rotate || 0, // rotate가 없는 경우 기본값 0
-                },
-              ],
-            }));
-          }
-          // 텍스트 박스
-          if (data.type === 'createTextbox') {
-            console.log('텍스트 박스 생성');
-            useTextStore.getState().addText({
-              id: data.id,
-              ...data.position,
-            });
-          } else if (data.type === 'textDrag') {
-            console.log('텍스트 드래그 발생');
-            useTextStore
-              .getState()
-              .updateText({ id: data.id, ...data.position });
-          } else if (data.type === 'textResize') {
-            console.log('텍스트 리사이즈 발생');
-            useTextStore
-              .getState()
-              .updateText({ id: data.id, ...data.position });
-          } else if (data.type === 'textInput') {
-            console.log('텍스트 입력 발생');
-            console.log('입력값:', data.content);
-            useTextStore.getState().updateText({
-              id: data.id,
-              content: data.content,
-            });
-          } else if (data.type === 'nicknameInput') {
-            console.log('닉네임 입력 발생');
-            console.log('입력값:', data.nickname);
-            useTextStore.getState().updateText({
-              id: data.id,
-              nickname: data.nickname,
-            });
-          } else if (data.type === 'saveText') {
-            console.log('saveText');
-            useTextStore.getState().updateText({
-              id: data.id,
-              content: data.content,
-              nickname: data.nickname,
-              showOnly: true,
-              ...data.position,
-            });
-            setSavedData((prevData) => ({
-              ...prevData,
-              textboxs: [
-                ...prevData.textboxs,
-                {
-                  textboxId: data.id,
-                  writer: data.nickname,
-                  xcoor: data.position.x,
-                  ycoor: data.position.y,
-                  height: data.position.height,
-                  width: data.position.width,
-                },
-              ],
-            }));
-            console.log('텍스트 저장', data.content, data.nickname);
-          }
-        }
-      });
-    });
-
-    setMetaTags({
-      title: '하루연결',
-      description: '“1월 30일”의 일상을 공유해요!',
-      imageUrl: 'https://i.postimg.cc/DZYT5Y2J/Share-Icon.png',
-    });
-
-    return () => {
-      client.disconnect();
-      console.log('WebSocket 연결 종료');
-    };
-  }, []);
+  setMetaTags({
+    title: '하루연결',
+    description: '“1월 30일”의 일상을 공유해요!',
+    imageUrl: 'https://i.postimg.cc/DZYT5Y2J/Share-Icon.png',
+  });
 
   return (
-    <BackLayout>
-      <PageFrame>
-        <WrapperNavigateBar>
-          <NavigateBar locate={'diary'} />
-        </WrapperNavigateBar>
-        <WrapperLargeSketchbook>
-          <LargeSketchbook />
-        </WrapperLargeSketchbook>
-        <WrapperInnerImg>
-          <InnerImg
-            websocket={stompClient}
-            diaryMonth={selectedDateInfo.selectedMonth}
-            diaryDay={selectedDateInfo.selectedDay}
-            diaryId={diaryId}
-            setHostId={setHostId}
-          />
-        </WrapperInnerImg>
-        <WrapperRightSticker>
-          {/* <RightSticker
+      <BackLayout>
+        <PageFrame>
+          <WrapperNavigateBar>
+            <NavigateBar locate={'diary'}/>
+          </WrapperNavigateBar>
+          <WrapperLargeSketchbook>
+            <LargeSketchbook/>
+          </WrapperLargeSketchbook>
+          <WrapperInnerImg>
+            <InnerImg
+                websocket={stompClient}
+                diaryMonth={selectedDateInfo.selectedMonth}
+                diaryDay={selectedDateInfo.selectedDay}
+                diaryId={diaryId}
+                setHostId={setHostId}
+            />
+          </WrapperInnerImg>
+          <WrapperRightSticker>
+            {/* <RightSticker
             diaryMonth={selectedDateInfo.selectedMonth}
             diaryDay={selectedDateInfo.selectedDay}
             onDalleSelect={handleDalleSelect}
             websocket={stompClient}
           /> */}
-        </WrapperRightSticker>
-        <WrapperDHomeButton>{hostCheck && <DHomeButton />}</WrapperDHomeButton>
-        <WrapperSaveButton>
-          {hostCheck && <SaveButton savedData={savedData} />}
-        </WrapperSaveButton>
-        <WrapperBasicSticker>
-          <BasicSticker
-            onStickerSelect={handleStickerSelect}
-            websocket={stompClient}
+          </WrapperRightSticker>
+          <WrapperDHomeButton>{hostCheck && <DHomeButton />}</WrapperDHomeButton>
+          <WrapperSaveButton>
+            {hostCheck && <SaveButton savedData={savedData}/>}
+          </WrapperSaveButton>
+          <WrapperBasicSticker>
+            <BasicSticker
+                onStickerSelect={handleStickerSelect}
+                websocket={stompClient}
+            />
+          </WrapperBasicSticker>
+          <TextButton
+              onClick={handleTextButtonClick}
+              websocket={stompClient}
+              diaryId={diaryId}
           />
-        </WrapperBasicSticker>
-        <TextButton
-          onClick={handleTextButtonClick}
-          websocket={stompClient}
-          diaryId={diaryId}
-        />
-      </PageFrame>
-    </BackLayout>
+        </PageFrame>
+      </BackLayout>
   );
 }
 
