@@ -3,7 +3,7 @@ import { Stomp } from '@stomp/stompjs';
 import textStore from "../stores/textStore.js";
 import useTextStore from "../stores/textStore.js"; // STOMP 사용
 
-const useWebSocket = (diaryId, websocketEventHandler, n) => {
+const useWebSocket = (diaryId, websocketEventHandler) => {
   const stompClient = useRef(null);
   const isFirstConnection = useRef(true);
 
@@ -20,7 +20,7 @@ const useWebSocket = (diaryId, websocketEventHandler, n) => {
       console.log('WebSocket 연결됨');
       client.subscribe(`/harurooms/${diaryId}`, (message) => {
         const data = JSON.parse(message.body);
-        websocketEventHandler(data, n);
+        websocketEventHandler(data);
         console.log("textStore: " + JSON.stringify(useTextStore.getState().texts));
       });
       client.subscribe('/user/')
