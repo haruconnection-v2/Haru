@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 public class TextInputEventHandler {
 
     public JsonNode handle(final Long objectId,
-            final JsonNode type, final JsonNode textData) {
+            final JsonNode type, final JsonNode textData, final JsonNode nickname) {
         //JsonNode objectId = payload.get(positionEventType.getIdType()); //objectId
         final ObjectNode response = JsonNodeFactory.instance.objectNode();
         response.set("type", type); //type
         response.set("id", TextNode.valueOf(objectId.toString()));
         response.set(type.getNodeType().name(), textData);
+        response.set("nickname", nickname);
 
         log.info("Response created: {}", response);
 

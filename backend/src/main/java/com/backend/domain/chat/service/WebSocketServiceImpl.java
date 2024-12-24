@@ -13,7 +13,6 @@ import com.backend.domain.chat.handler.event.PersistenceEventType;
 import com.backend.domain.chat.handler.event.PositionEventType;
 import com.backend.domain.chat.handler.event.TextInputEventType;
 import com.backend.domain.chat.handler.event.eventProcessor.EventQueueManager;
-import com.backend.domain.chat.handler.event.eventProcessor.PositionEventProcessor;
 import com.backend.domain.chat.repository.HaruRoomRepository;
 import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.mapper.TextBoxMapper;
@@ -64,7 +63,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private final DiaryTextBoxRepository diaryTextBoxRepository;
     private final HaruRoomRepository haruRoomRepository;
-    private final PositionEventProcessor positionEventProcessor;
     private final SaveTextBoxHandler saveTextBoxHandler;
     private final PositionEventHandler positionEventHandler;
     private final EventQueueManager<JsonNode> eventQueueManager;
@@ -143,12 +141,13 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void positionProcess(final Long roomId, final PositionEventReq positionEventReq) {
         final Long objectId = positionEventReq.getId();
         final PositionData positionData = positionEventReq.getPositionData();
+        final JsonNode nickname = positionEventReq.getNickname();
         log.info("websocketService.positionProcess: x: {}, y: {}",
                 positionData.getX(), positionData.getY());
         PositionEventType eventType = PositionEventType.setType(positionEventReq.getType());
         eventQueueManager.submitEvent(objectId,
                 () -> positionEventHandler.handle(objectId, eventType.getEventType(),
-                        positionData.node())
+                        positionData.node(), nickname)
         ).thenAccept(res -> {
             messagingTemplate.convertAndSend("/harurooms/" + roomId, res);
             log.info("Message sent to room {}: {}", roomId, res);
@@ -163,8 +162,10 @@ public class WebSocketServiceImpl implements WebSocketService {
                 textInputEventReq.getType());
         final Long objectId = textInputEventReq.getId();
         final JsonNode textData = textInputEventReq.getTextData();
+        final JsonNode nickname = textInputEventReq.getNickname();
         eventQueueManager.submitEvent(objectId,
-                        () -> textInputEventHandler.handle(objectId, eventType.getEventType(), textData))
+                        () -> textInputEventHandler.handle(objectId, eventType.getEventType(), textData,
+                                nickname))
                 .thenAccept(res -> messagingTemplate.convertAndSend("/harurooms/" + roomId, res))
                 .exceptionally(ex -> {
                     throw new IllegalArgumentException(ex);
@@ -175,15 +176,17 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Transactional
     public void textCreateProcess(final Long roomId,
             final PersistenceTextBoxReq persistenceTextBoxReq) {
-        JsonNode type = persistenceTextBoxReq.getType();
+        final JsonNode type = persistenceTextBoxReq.getType();
         validateType(type, PersistenceEventType.CREATE_TEXT);
-        PositionData positionData = persistenceTextBoxReq.getPositionData();
+        final PositionData positionData = persistenceTextBoxReq.getPositionData();
         HaruRoom haruRoom = haruRoomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
-        DiaryTextBox textBox = diaryTextBoxRepository.save(TextBoxMapper.toCreateEntity(positionData, haruRoom));
+        final DiaryTextBox textBox = diaryTextBoxRepository.save(
+                TextBoxMapper.toCreateEntity(positionData, haruRoom));
+        final JsonNode nickname = persistenceTextBoxReq.getNickname();
         eventQueueManager.submitEvent(textBox.getId(),
                 () -> positionEventHandler.handle(textBox.getId(),
-                        persistenceTextBoxReq.getType(), positionData.node())
+                        persistenceTextBoxReq.getType(), positionData.node(), nickname)
         ).thenAccept(res -> {
             messagingTemplate.convertAndSend("/harurooms/" + roomId, res);
             log.info("Message sent to room {}: {}", roomId, res);
@@ -197,16 +200,16 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Transactional
     public void textSaveProcess(final Long roomId,
             final PersistenceTextBoxReq persistenceTextBoxReq) {
-        Long objectId = persistenceTextBoxReq.getId();
-        JsonNode type = persistenceTextBoxReq.getType();
+        final Long objectId = persistenceTextBoxReq.getId();
+        final JsonNode type = persistenceTextBoxReq.getType();
         validateType(type, PersistenceEventType.SAVE_TEXT);
-        String content = persistenceTextBoxReq.getContent();
-        String nickname = persistenceTextBoxReq.getNickname();
-        PositionData positionData = persistenceTextBoxReq.getPositionData();
-        DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(objectId).orElseThrow(
+        final String content = persistenceTextBoxReq.getContent();
+        final JsonNode nickname = persistenceTextBoxReq.getNickname();
+        final PositionData positionData = persistenceTextBoxReq.getPositionData();
+        final DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(objectId).orElseThrow(
                 () -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
         );
-        diaryTextBox.updateDiaryTextBox(content, nickname, positionData);
+        diaryTextBox.updateDiaryTextBox(content, nickname.asText(), positionData);
         diaryTextBoxRepository.save(diaryTextBox);
 
         eventQueueManager.submitEvent(objectId,
@@ -218,15 +221,16 @@ public class WebSocketServiceImpl implements WebSocketService {
                 });
     }
 
-    private void validateType(JsonNode type, PersistenceEventType persistenceEventType) {
+    private void validateType(final JsonNode type,
+            final PersistenceEventType persistenceEventType) {
         if (!persistenceEventType.isEqual(type)) {
             throw new IllegalArgumentException(type.asText());
         }
     }
 
-    public void textDeleteProcess(Long roomId, TextDeleteEventReq deleteEventReq) {
+    public void textDeleteProcess(final Long roomId, final TextDeleteEventReq deleteEventReq) {
         diaryTextBoxRepository.deleteById(deleteEventReq.id());
-        ObjectNode response = JsonNodeFactory.instance.objectNode();
+        final ObjectNode response = JsonNodeFactory.instance.objectNode();
         response.set("type", deleteEventReq.type());
         response.put("id", deleteEventReq.id().toString());
         if (response.isNull()) {
