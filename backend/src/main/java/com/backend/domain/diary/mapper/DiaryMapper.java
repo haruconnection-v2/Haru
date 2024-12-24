@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DiaryMapper {
-	public static DiaryResponse toDetailDiaryResponse(Diary diary, String nickname) {
+	public static DiaryResponse toDetailDiaryResponse(final Diary diary, final String nickname) {
 		return DiaryResponse.builder()
 			.diaryId(diary.getId())
 			.monthYear(diary.getMonthYear())

@@ -7,6 +7,7 @@ import SignUpPage from './pages/SignUpPage';
 import DiaryPage from './pages/DiaryPage';
 import GlobalStyles from './GlobalStyles';
 import PastPage from './pages/PastPage';
+import GuestPage from "./pages/GuestPage.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/diary/:diaryId" element={<DiaryPage />} />
+        <Route path="/guest/:diaryId" element={<GuestPage />} />
         <Route path="/past" element={<PastPage />} />
       </Routes>
     </Router>

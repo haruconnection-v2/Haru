@@ -26,8 +26,6 @@ import com.backend.domain.diary.dto.DiaryRequest;
 import com.backend.domain.diary.dto.DiaryResponse;
 import com.backend.domain.diary.dto.DiarySnsDto;
 import com.backend.domain.diary.entity.Diary;
-import com.backend.domain.diary.entity.DiarySticker;
-import com.backend.domain.diary.entity.DiaryTextBox;
 import com.backend.domain.diary.repository.DiaryRepository;
 import com.backend.global.common.exception.BadRequestException;
 import com.backend.global.common.exception.ConflictException;
@@ -88,7 +86,7 @@ class DiaryServiceImplTest {
     @Test
     void 일기_조회에_실패하여_예외가_발생한다() {
         given(diaryRepository.findById(any())).willReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> diaryService.getDiaryDetialData(1L, request));
+        assertThrows(NotFoundException.class, () -> diaryService.getDiaryDetailData(1L, request));
         verify(diaryRepository).findById(any());
     }
 
@@ -97,7 +95,7 @@ class DiaryServiceImplTest {
         given(diaryRepository.findById(any())).willReturn(Optional.of(foundDiary));
         given(request.getSession()).willReturn(session);
         given(session.getAttribute("nickname")).willReturn(anyString());
-        DiaryResponse diaryResponse = diaryService.getDiaryDetialData(foundDiary.getId(), request);
+        DiaryResponse diaryResponse = diaryService.getDiaryDetailData(foundDiary.getId(), request);
         assertNotNull(diaryResponse);
         assertEquals(foundDiary.getId(), diaryResponse.getDiaryId());
         assertEquals(foundDiary.getMonthYear(), diaryResponse.getMonthYear());

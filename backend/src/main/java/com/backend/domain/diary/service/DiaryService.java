@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public interface DiaryService {
-	DiaryResponse getDiaryDetialData(Long diaryId, HttpServletRequest request);
+	DiaryResponse getDiaryDetailData(Long diaryId, HttpServletRequest request);
 
 	DiaryResponse getDiarySnsLink(String day, HttpServletRequest request);
 

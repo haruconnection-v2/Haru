@@ -30,7 +30,6 @@ public class StopObjectHandler implements MessageHandler {
 	private final DiaryStickerUtils diaryStickerUtils;
 	private final DiaryTextBoxUtils diaryTextBoxUtils;
 
-	@Async
 	@Override
 	public CompletableFuture<JsonNode> handle(Map<String, JsonNode> payload) {
 		String objectType = payload.get("objectType").asText();
@@ -78,7 +77,7 @@ public class StopObjectHandler implements MessageHandler {
 				.height(Integer.parseInt(height))
 				.build();
 
-			diaryTextBox.updateDiaryTextBox(req);
+			//diaryTextBox.updateDiaryTextBox(req);
 			diaryTextBoxRepository.save(diaryTextBox);
 
 		}

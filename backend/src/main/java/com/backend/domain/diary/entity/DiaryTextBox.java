@@ -1,8 +1,9 @@
 package com.backend.domain.diary.entity;
 
-import com.backend.domain.chat.dto.request.UpdateDiaryTextBoxReq;
+import com.backend.domain.chat.dto.request.PositionData;
 import com.backend.global.common.BaseEntity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,8 +22,10 @@ public class DiaryTextBox extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(length = 50)
+	@Nullable
 	private String writer;
 	@Column(length = 500)
+	@Nullable
 	private String content;
 	private int xcoor;
 	private int ycoor;
@@ -46,11 +49,12 @@ public class DiaryTextBox extends BaseEntity {
 		this.diary = diary;
 	}
 
-	public void updateDiaryTextBox(UpdateDiaryTextBoxReq updateDiaryTextBoxReq) {
-		this.content = updateDiaryTextBoxReq.getContent();
-		this.xcoor = updateDiaryTextBoxReq.getXcoor();
-		this.ycoor = updateDiaryTextBoxReq.getYcoor();
-		this.width = updateDiaryTextBoxReq.getWidth();
-		this.height = updateDiaryTextBoxReq.getHeight();
+	public void updateDiaryTextBox(String content, String nickname, PositionData positionData) {
+		this.content = content;
+		this.writer = nickname;
+		this.xcoor = positionData.getX();
+		this.ycoor = positionData.getY();
+		this.width = positionData.getWidth();
+		this.height = positionData.getHeight();
 	}
 }

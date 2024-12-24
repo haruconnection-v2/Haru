@@ -26,7 +26,6 @@ public class CreateDalleHandler implements RoomMessageHandler {
     private final DiaryStickerRepository diaryStickerRepository;
     private final HaruRoomUtils haruRoomUtils;
 
-    @Async
     @Override
     public CompletableFuture<JsonNode> handle(Long roomId, Map<String, JsonNode> payload) {
 

@@ -1,29 +1,27 @@
 package com.backend.domain.chat.handler.event;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.Arrays;
 import lombok.Getter;
 
 @Getter
 public enum PositionEventType {
-    IMAGE_DRAG("position", TextNode.valueOf("imageDrag"), "id"),
-    IMAGE_RESIZE("position", TextNode.valueOf("imageResize"), "id"),
-    IMAGE_ROTATE("position", TextNode.valueOf("imageRotate"), "id"),
-    TEXT_DRAG("position", TextNode.valueOf("textDrag"), "id"),
-    TEXT_RESIZE("position", TextNode.valueOf("textResize"), "id");
+    IMAGE_DRAG(TextNode.valueOf("imageDrag")),
+    IMAGE_RESIZE(TextNode.valueOf("imageResize")),
+    IMAGE_ROTATE(TextNode.valueOf("imageRotate")),
+    TEXT_DRAG(TextNode.valueOf("textDrag")),
+    TEXT_DRAG_STOP(TextNode.valueOf("textDragStop")),
+    TEXT_RESIZE(TextNode.valueOf("textResize"));
 
-    private final String handlerType;
     private final TextNode eventType;
-    private final String idType;
 
-    PositionEventType(String handlerType, TextNode eventType, String idType) {
-        this.handlerType = handlerType;
+    PositionEventType(TextNode eventType) {
         this.eventType = eventType;
-        this.idType = idType;
     }
 
-    public static PositionEventType setType(String type) {
-        return Arrays.stream(values()).filter(t -> t.eventType.asText().equals(type)).findFirst()
+    public static PositionEventType setType(final JsonNode type) {
+        return Arrays.stream(values()).filter(t -> t.eventType.equals(type)).findFirst()
                 .orElseThrow();
     }
 }

@@ -1,12 +1,32 @@
 package com.backend.domain.chat.service;
 
+import com.backend.domain.chat.dto.request.PersistenceTextBoxReq;
+import com.backend.domain.chat.dto.request.PositionData;
+import com.backend.domain.chat.dto.request.PositionEventReq;
+import com.backend.domain.chat.dto.request.TextDeleteEventReq;
+import com.backend.domain.chat.dto.request.TextInputEventReq;
+import com.backend.domain.chat.entity.HaruRoom;
 import com.backend.domain.chat.handler.PositionEventHandler;
+import com.backend.domain.chat.handler.SaveTextBoxHandler;
+import com.backend.domain.chat.handler.TextInputEventHandler;
+import com.backend.domain.chat.handler.event.PersistenceEventType;
 import com.backend.domain.chat.handler.event.PositionEventType;
+import com.backend.domain.chat.handler.event.TextInputEventType;
+import com.backend.domain.chat.handler.event.eventProcessor.EventQueueManager;
 import com.backend.domain.chat.handler.event.eventProcessor.PositionEventProcessor;
+import com.backend.domain.chat.repository.HaruRoomRepository;
+import com.backend.domain.diary.entity.DiaryTextBox;
+import com.backend.domain.diary.mapper.TextBoxMapper;
+import com.backend.domain.diary.repository.DiaryTextBoxRepository;
+import com.backend.global.common.exception.NotFoundException;
+import com.backend.global.common.response.ErrorCode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.chat.handler.CreateDalleHandler;
@@ -42,8 +62,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class WebSocketServiceImpl implements WebSocketService {
 
+    private final DiaryTextBoxRepository diaryTextBoxRepository;
+    private final HaruRoomRepository haruRoomRepository;
     private final PositionEventProcessor positionEventProcessor;
+    private final SaveTextBoxHandler saveTextBoxHandler;
     private final PositionEventHandler positionEventHandler;
+    private final EventQueueManager<JsonNode> eventQueueManager;
+    private final TextInputEventHandler textInputEventHandler;
+    private final SimpMessagingTemplate messagingTemplate; //특정 Broker로 메세지를 전달
+
 
     private final TextInputHandler textInputHandler;
     private final NicknameInputHandler nicknameInputHandler;
@@ -74,7 +101,6 @@ public class WebSocketServiceImpl implements WebSocketService {
         handlerMap.put("nicknameInput", nicknameInputHandler);
         handlerMap.put("textDrag", textDragHandler);
         handlerMap.put("textResize", textResizeHandler);
-        handlerMap.put("saveText", saveTextHandler);
         handlerMap.put("imageDrag", imageDragHandler);
         handlerMap.put("imageResize", imageResizeHandler);
         handlerMap.put("imageRotate", imageRotateHandler);
@@ -114,13 +140,98 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     @Override
-    public CompletableFuture<JsonNode> positionProcess(String type, Long objectId,
-            Map<String, JsonNode> payload) {
-        log.info("websocketService.positionProcess: {}", payload);
-        PositionEventType eventType = PositionEventType.setType(type);
-        //String objectId = payload.get(eventType.getIdType()).asText();
-        return positionEventProcessor.submitEvent(objectId ,
-                () -> positionEventHandler.handle(objectId, eventType, payload)
+    public void positionProcess(final Long roomId, final PositionEventReq positionEventReq) {
+        final Long objectId = positionEventReq.getId();
+        final PositionData positionData = positionEventReq.getPositionData();
+        log.info("websocketService.positionProcess: x: {}, y: {}",
+                positionData.getX(), positionData.getY());
+        PositionEventType eventType = PositionEventType.setType(positionEventReq.getType());
+        eventQueueManager.submitEvent(objectId,
+                () -> positionEventHandler.handle(objectId, eventType.getEventType(),
+                        positionData.node())
+        ).thenAccept(res -> {
+            messagingTemplate.convertAndSend("/harurooms/" + roomId, res);
+            log.info("Message sent to room {}: {}", roomId, res);
+        }).exceptionally(ex -> {
+            throw new IllegalArgumentException(ex);
+        });
+    }
+
+    @Override
+    public void textInputProcess(final Long roomId, final TextInputEventReq textInputEventReq) {
+        final TextInputEventType eventType = TextInputEventType.setType(
+                textInputEventReq.getType());
+        final Long objectId = textInputEventReq.getId();
+        final JsonNode textData = textInputEventReq.getTextData();
+        eventQueueManager.submitEvent(objectId,
+                        () -> textInputEventHandler.handle(objectId, eventType.getEventType(), textData))
+                .thenAccept(res -> messagingTemplate.convertAndSend("/harurooms/" + roomId, res))
+                .exceptionally(ex -> {
+                    throw new IllegalArgumentException(ex);
+                });
+    }
+
+    @Override
+    @Transactional
+    public void textCreateProcess(final Long roomId,
+            final PersistenceTextBoxReq persistenceTextBoxReq) {
+        JsonNode type = persistenceTextBoxReq.getType();
+        validateType(type, PersistenceEventType.CREATE_TEXT);
+        PositionData positionData = persistenceTextBoxReq.getPositionData();
+        HaruRoom haruRoom = haruRoomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ROOM_NOT_FOUND));
+        DiaryTextBox textBox = diaryTextBoxRepository.save(TextBoxMapper.toCreateEntity(positionData, haruRoom));
+        eventQueueManager.submitEvent(textBox.getId(),
+                () -> positionEventHandler.handle(textBox.getId(),
+                        persistenceTextBoxReq.getType(), positionData.node())
+        ).thenAccept(res -> {
+            messagingTemplate.convertAndSend("/harurooms/" + roomId, res);
+            log.info("Message sent to room {}: {}", roomId, res);
+        }).exceptionally(ex -> {
+            throw new IllegalArgumentException(ex);
+        });
+
+    }
+
+    @Override
+    @Transactional
+    public void textSaveProcess(final Long roomId,
+            final PersistenceTextBoxReq persistenceTextBoxReq) {
+        Long objectId = persistenceTextBoxReq.getId();
+        JsonNode type = persistenceTextBoxReq.getType();
+        validateType(type, PersistenceEventType.SAVE_TEXT);
+        String content = persistenceTextBoxReq.getContent();
+        String nickname = persistenceTextBoxReq.getNickname();
+        PositionData positionData = persistenceTextBoxReq.getPositionData();
+        DiaryTextBox diaryTextBox = diaryTextBoxRepository.findById(objectId).orElseThrow(
+                () -> new NotFoundException(ErrorCode.TEXT_BOX_NOT_FOUND)
         );
+        diaryTextBox.updateDiaryTextBox(content, nickname, positionData);
+        diaryTextBoxRepository.save(diaryTextBox);
+
+        eventQueueManager.submitEvent(objectId,
+                        () -> saveTextBoxHandler.handle(objectId, type, content, nickname,
+                                positionData.node()))
+                .thenAccept(res -> messagingTemplate.convertAndSend("/harurooms/" + roomId, res))
+                .exceptionally(ex -> {
+                    throw new IllegalArgumentException(ex);
+                });
+    }
+
+    private void validateType(JsonNode type, PersistenceEventType persistenceEventType) {
+        if (!persistenceEventType.isEqual(type)) {
+            throw new IllegalArgumentException(type.asText());
+        }
+    }
+
+    public void textDeleteProcess(Long roomId, TextDeleteEventReq deleteEventReq) {
+        diaryTextBoxRepository.deleteById(deleteEventReq.id());
+        ObjectNode response = JsonNodeFactory.instance.objectNode();
+        response.set("type", deleteEventReq.type());
+        response.put("id", deleteEventReq.id().toString());
+        if (response.isNull()) {
+            throw new NullPointerException("");
+        }
+        messagingTemplate.convertAndSend("/harurooms/" + roomId, response);
     }
 }
