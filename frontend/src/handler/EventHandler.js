@@ -74,3 +74,15 @@ export const websocketHandleEvent = (data) => {
     console.log('Invalid handler type')
   }
 }
+
+export const localHandleEvent = (data) => {
+  const type = data.type;
+  if (textboxHandlers[type]) {
+    textboxHandlers[type](data);
+    console.log("data.type:", data.type);
+  } else if (imageHandlers[type]) {
+    imageHandlers[type](data)
+  } else {
+    console.log('Invalid handler type')
+  }
+}

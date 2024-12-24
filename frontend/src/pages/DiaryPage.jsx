@@ -13,7 +13,7 @@ import InnerImg from '../components/DiaryPage/InnerImg';
 import useTextStore from '../stores/textStore';
 import useUserInfoStore from '../stores/userInfoStore';
 import useWebSocket from "../util/WebSocketConfig.js";
-import {handleEvent} from "../handler/EventHandler.js";
+import {websocketHandleEvent} from "../handler/EventHandler.js";
 import {textBoxActions} from "../stores/storeHelper.js"; // STOMP 사용
 
 const setMetaTags = ({
@@ -85,7 +85,7 @@ function DiaryPage() {
     setSelectedDalle(image);
   };
 
-  const stompClient =  useWebSocket(diaryId, handleEvent, nickname);
+  const stompClient =  useWebSocket(diaryId, websocketHandleEvent);
 
   setMetaTags({
     title: '하루연결',
