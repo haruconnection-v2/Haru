@@ -11,15 +11,15 @@ public class TextInputEventReq {
     private final JsonNode type;
     private final Long id;
     private final JsonNode textData;
-    private final String userId;
+    private final JsonNode nickname;
 
     @JsonCreator
     public TextInputEventReq(final JsonNode type, final Long id, final JsonNode content,
-            final JsonNode nickname, final String userId) {
+            final JsonNode nickname) {
         this.type = type;
         this.id = id;
         this.textData = determineTextData(content, nickname);
-        this.userId = userId;
+        this.nickname = nickname;
     }
 
     private JsonNode determineTextData(final JsonNode content, final JsonNode nickname) {

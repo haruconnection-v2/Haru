@@ -8,6 +8,10 @@ import {useDiaryContent} from '../../stores/useDiaryContent';
 import useTextStore from '../../stores/textStore';
 import xclose from '../../assets/img/xclose.png';
 import useThrottle from "../../util/useThrottle.js";
+import {
+  localHandleEvent,
+  websocketHandleEvent
+} from "../../handler/EventHandler.js";
 
 function TextBox({
   username,
@@ -37,7 +41,7 @@ function TextBox({
       type,
       id: textId,
       position: updatedPosition,
-      userId: localStorage.getItem("loggedInUserNickname"),
+      nickname: localStorage.getItem("loggedInUserNickname"),
     };
 
     if (content !== null) {
@@ -52,6 +56,7 @@ function TextBox({
       destination: `/send/${destination}/${diaryId}`,
       body: JSON.stringify(message),
     });
+    localHandleEvent(message);
   };
 
   const handleDrag = useThrottle((e, d) => {

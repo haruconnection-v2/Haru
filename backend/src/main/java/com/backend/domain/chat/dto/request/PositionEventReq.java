@@ -12,14 +12,14 @@ public class PositionEventReq {
     private final Long id;
     @NotNull
     private final PositionData positionData;
-    private final String userId;
+    private final JsonNode nickname;
 
     public PositionEventReq(
-            final JsonNode type, final Long id, final String userId,
+            final JsonNode type, final Long id, final JsonNode nickname,
             @JsonProperty("position") final JsonNode position) {
         this.type = type;
         this.id = id;
-        this.userId = userId;
+        this.nickname = nickname;
         this.positionData = new PositionData(position);
     }
 }

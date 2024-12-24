@@ -19,6 +19,7 @@ function TextButton({ onClick, websocket, diaryId }) {
           x: 100,
           y: 100,
         },
+        nickname : localStorage.getItem("loggedInUserNickname"),
       }),
     });
   };

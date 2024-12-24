@@ -9,19 +9,17 @@ public class PersistenceTextBoxReq {
 
     private final JsonNode type;
     private final Long id;
-    private final String nickname;
+    private final JsonNode nickname;
     private final String content;
     private final PositionData positionData;
-    private final String userId;
 
     public PersistenceTextBoxReq(
-            final JsonNode type, final Long id, final String content, final String nickname,
-            @JsonProperty("position") JsonNode position, final String userId) {
+            final JsonNode type, final Long id, final String content, final JsonNode nickname,
+            @JsonProperty("position") JsonNode position) {
         this.type = type;
         this.id = id;
         this.content = content;
         this.nickname = nickname;
         this.positionData = new PositionData(position);
-        this.userId = userId;
     }
 }

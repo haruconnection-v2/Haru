@@ -26,16 +26,16 @@ const textboxHandlers  = {
   createTextBox: (data) => {
     textBoxActions.addTextBox({id: data.id, ...data.position})
   },
-  textDrag:(data, textActions) => {
+  textDrag:(data) => {
     textBoxActions.updateTextBox({id: data.id, ...data.position});
   },
-  textDragStop:(data, textActions) => {
+  textDragStop:(data) => {
     textBoxActions.updateTextBox({id: data.id, ...data.position});
   },
-  textResize: (data, textActions) => {
+  textResize: (data) => {
     textBoxActions.updateTextBox({id: data.id, ...data.position});
   },
-  textInput: (data, textActions) => {
+  textInput: (data) => {
     textBoxActions.updateTextBox({
       id: data.id,
       content: data.content});
@@ -50,13 +50,14 @@ const textboxHandlers  = {
       ...data.position,
     });
   },
-  deleteTextBox: (data, textActions) => {
+  deleteTextBox: (data) => {
     console.log("deleteTextId: " + data.id);
     textBoxActions.deleteTextBox(data.id)
   }
 };
 
-export const handleEvent = (data, nickname) => {
+export const websocketHandleEvent = (data) => {
+  const nickname = data.nickname;
   const localNickname = localStorage.getItem('loggedInUserNickname');
   console.log('localNick: ' + localNickname + ' inputNick: ' + nickname);
   const type = data.type;
@@ -65,6 +66,18 @@ export const handleEvent = (data, nickname) => {
       textboxHandlers[type](data);
     }
   } else if (textboxHandlers[type]) {
+    textboxHandlers[type](data);
+    console.log("data.type:", data.type);
+  } else if (imageHandlers[type]) {
+    imageHandlers[type](data)
+  } else {
+    console.log('Invalid handler type')
+  }
+}
+
+export const localHandleEvent = (data) => {
+  const type = data.type;
+  if (textboxHandlers[type]) {
     textboxHandlers[type](data);
     console.log("data.type:", data.type);
   } else if (imageHandlers[type]) {
